@@ -37,18 +37,37 @@ def request_handler(url):
     for i in range(REQ_ATTEMPTS):
         try: 
             response = urllib.request.urlopen(req, timeout=TIMEOUT)
-            if response.getcode() == 200:
+            resp_code = response.getcode()
+            if resp_code == 200:
                 return response.read()
         except Exception as e:
-            time.sleep(2)
             err = str(e)
+            time.sleep(2)
     logging.error("{}:{}".format(url,err))
     return None
 
-# URL Setup
-GRAPH_API = 'https://graph.facebook.com/v2.4'
 
 # DEBUG
-print(request_handler(GRAPH_API))
-print(request_handler('http://google.com') )
-print(request_handler('http://aaaq.com') )
+#print(request_handler(GRAPH_API))
+#print(request_handler('http://google.com') )
+#print(request_handler('http://aaaq.com') )
+
+# URL Setup
+GRAPH_API = 'https://graph.facebook.com/v2.10'
+# 2D-women-are-the-only-possible-path-to-the-success-of-humanity-as-a-species
+page = '762580480426589'
+req_type = 'feed'
+fields='message,link,tags,object_attachment'
+url = '{root}/{page}/{req}/?fields={fields}&access_token={token}'.format(root=GRAPH_API,page=page,req=req_type,fields=fields,token=token)
+
+data = request_handler(url)
+if not data:
+    print('Request failed')
+    exit(1)
+
+json_data = json.loads(data)
+
+# Debug
+print (json.dumps(json_data, indent=4, sort_keys=True))
+
+
