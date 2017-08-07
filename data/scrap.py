@@ -46,6 +46,36 @@ def request_handler(url):
     logging.error("{}:{}".format(url,err))
     return None
 
+def traverse_posts(page_id):
+    global token
+    req_type = 'feed'
+    fields='message,link,tags,object_attachment,created_time'
+    url = '{root}/{page}/{req}/?fields={fields}&access_token={token}'.format(root=GRAPH_API,page=page,req=req_type,fields=fields,token=token) 
+    #Debug
+    #print(url)
+
+    # Debug
+    #print (json.dumps(json_data, indent=4, sort_keys=True))
+    num_posts = 0
+    with open('DXC_tech_page.json', 'w') as outfile:
+        while True:
+            data = request_handler(url)
+            if not data: 
+                print('Request failed')
+                break
+            
+            json_data = json.loads(data)
+            json.dump(json_data['data'], outfile)
+            num_posts += len(json_data['data'])
+            print('Number of posts: {}'.format(num_posts))
+            try:
+                url = json_data['paging']['next']
+            except KeyError:
+                logging.info('Scrapped posts: {}'.format(num_posts))
+                break
+
+            print("-----------------------------NEXT PAGE----------------------------------------")
+    
 
 # DEBUG
 #print(request_handler(GRAPH_API))
@@ -54,20 +84,30 @@ def request_handler(url):
 
 # URL Setup
 GRAPH_API = 'https://graph.facebook.com/v2.10'
-# 2D-women-are-the-only-possible-path-to-the-success-of-humanity-as-a-species
-page = '762580480426589'
-req_type = 'feed'
-fields='message,link,tags,object_attachment'
-url = '{root}/{page}/{req}/?fields={fields}&access_token={token}'.format(root=GRAPH_API,page=page,req=req_type,fields=fields,token=token)
 
-data = request_handler(url)
-if not data:
-    print('Request failed')
-    exit(1)
+# FB Page: 2D-women-are-the-only-possible-path-to-the-success-of-humanity-as-a-species
+#page = '762580480426589'
 
-json_data = json.loads(data)
+# FB Page: DXC Technology
+page = 'DXCTechnology'
 
-# Debug
-print (json.dumps(json_data, indent=4, sort_keys=True))
+traverse_posts(page)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
