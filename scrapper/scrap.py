@@ -46,10 +46,10 @@ def request_handler(url):
     logging.error("{}:{}".format(url,err))
     return None
 
-def traverse_posts(page_id):
+def traverse_posts(page_id, get_reactions=False):
     global token
     req_type = 'feed'
-    fields='message,link,tags,object_attachment,created_time,description'
+    fields='from,message,link,tags,object_attachment,created_time,description'
     url = '{root}/{page}/{req}/?fields={fields}&access_token={token}'.format(root=GRAPH_API,page=page,req=req_type,fields=fields,token=token) 
     #Debug
     #print(url)
@@ -86,7 +86,8 @@ def traverse_posts(page_id):
             for a_p in json_feed_data['data'][1:]:
                 a_post = a_p.copy()
                 a_post['comments'] = []
-                a_post['reactions'] = []
+                a_post['reactions'] =[]
+                a_post['reactions_count'] = {}
                 outfile.write(',')
 
                 #------- Comments ------------------------------------------------------------------------------------------------------------------------------
@@ -103,20 +104,36 @@ def traverse_posts(page_id):
                         logging.info('Post: {},  Nuber of comments: {}'.format(a_post['id'], len(a_post['comments'])))
                         break
                 #-----------------------------------------------------------------------------------------------------------------------------------------------
-               
-                #------- Reactions -----------------------------------------------------------------------------------------------------------------------------
-                req_type = 'reactions'
-                reactions_url = '{root}/{post_id}/{req}/?access_token={token}'.format(root=GRAPH_API,post_id=a_post['id'],req=req_type,token=token)
-                while True:
-                    reactions = request_handler(reactions_url)
-                    json_reactions_data = json.loads(reactions)
-                    a_post['reactions'] += json_reactions_data['data']
+                
+                if get_reactions:
+                    #------- Reactions -----------------------------------------------------------------------------------------------------------------------------
+                    req_type = 'reactions'
+                    reactions_url = '{root}/{post_id}/{req}/?access_token={token}'.format(root=GRAPH_API,post_id=a_post['id'],req=req_type,token=token)
+                    while True:
+                        reactions = request_handler(reactions_url)
+                        json_reactions_data = json.loads(reactions)
+                        a_post['reactions'] += json_reactions_data['data']
 
-                    try:
-                        reactions_url = json_reactions_data['paging']['next']
-                    except KeyError:
-                        logging.info('Post: {},  Nuber of reactions: {}'.format(a_post['id'], len(a_post['reactions'])))
-                        break
+                        try:
+                            reactions_url = json_reactions_data['paging']['next']
+                        except KeyError:
+                            logging.info('Post: {},  Nuber of reactions: {}'.format(a_post['id'], len(a_post['reactions'])))
+                            break
+                    #-----------------------------------------------------------------------------------------------------------------------------------------------
+
+                #------- Reactions Count -----------------------------------------------------------------------------------------------------------------------
+                reactions_count_url = '{root}/{post_id}/?fields=reactions.type(LIKE).limit(0).summary(total_count).as(reactions_like),'        \
+                                                             + 'reactions.type(LOVE).limit(0).summary(total_count).as(reactions_love),'        \
+                                                             + 'reactions.type(WOW).limit(0).summary(total_count).as(reactions_wow),'          \
+                                                             + 'reactions.type(HAHA).limit(0).summary(total_count).as(reactions_haha),'         \
+                                                             + 'reactions.type(SAD).limit(0).summary(total_count).as(reactions_sad),'           \
+                                                             + 'reactions.type(ANGRY).limit(0).summary(total_count).as(reactions_angry),'       \
+                                                             + 'reactions.type(THANKFUL).limit(0).summary(total_count).as(reactions_thankful)' \
+                                                             + '&access_token={token}'
+                reactions_count_url       = reactions_count_url.format(root=GRAPH_API,post_id=a_post['id'],token=token)
+                reactions_count           = request_handler(reactions_count_url)
+                json_reactions_count_data = json.loads(reactions_count)
+                a_post['reactions_count'] = json_reactions_count_data.copy()
                 #-----------------------------------------------------------------------------------------------------------------------------------------------
 
 
