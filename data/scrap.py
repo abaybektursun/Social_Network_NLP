@@ -49,33 +49,87 @@ def request_handler(url):
 def traverse_posts(page_id):
     global token
     req_type = 'feed'
-    fields='message,link,tags,object_attachment,created_time'
+    fields='message,link,tags,object_attachment,created_time,description'
     url = '{root}/{page}/{req}/?fields={fields}&access_token={token}'.format(root=GRAPH_API,page=page,req=req_type,fields=fields,token=token) 
     #Debug
     #print(url)
 
     # Debug
-    #print (json.dumps(json_data, indent=4, sort_keys=True))
+    #print (json.dumps(json_feed_data, indent=4, sort_keys=True))
     num_posts = 0
     with open('DXC_tech_page.json', 'w') as outfile:
+        outfile.write('[')
+        data = request_handler(url)
+        if not data:
+            print('Request failed')
+
+        json_feed_data = json.loads(data)
+        a_post = json_feed_data['data'][0]
+        
+        #Debug
+        print(url)
+
+        json.dump(a_post, outfile, indent=4)
+        
+        try:
+            url = json_feed_data['paging']['next']
+        except KeyError:
+            return
+
         while True:
             data = request_handler(url)
             if not data: 
                 print('Request failed')
                 break
             
-            json_data = json.loads(data)
-            json.dump(json_data['data'], outfile)
-            num_posts += len(json_data['data'])
-            print('Number of posts: {}'.format(num_posts))
+            json_feed_data = json.loads(data)
+            for a_p in json_feed_data['data'][1:]:
+                a_post = a_p.copy()
+                a_post['comments'] = []
+                a_post['reactions'] = []
+                outfile.write(',')
+
+                #------- Comments ------------------------------------------------------------------------------------------------------------------------------
+                req_type = 'comments'
+                comments_url = '{root}/{post_id}/{req}/?access_token={token}'.format(root=GRAPH_API,post_id=a_post['id'],req=req_type, token=token)
+                while True:
+                    comments = request_handler(comments_url)
+                    json_comment_data = json.loads(comments)
+                    a_post['comments']  += json_comment_data['data'] 
+                    
+                    try:
+                        comments_url = json_comment_data['paging']['next']
+                    except KeyError:
+                        logging.info('Post: {},  Nuber of comments: {}'.format(a_post['id'], len(a_post['comments'])))
+                        break
+                #-----------------------------------------------------------------------------------------------------------------------------------------------
+               
+                #------- Reactions -----------------------------------------------------------------------------------------------------------------------------
+                req_type = 'reactions'
+                reactions_url = '{root}/{post_id}/{req}/?access_token={token}'.format(root=GRAPH_API,post_id=a_post['id'],req=req_type,token=token)
+                while True:
+                    reactions = request_handler(reactions_url)
+                    json_reactions_data = json.loads(reactions)
+                    a_post['reactions'] += json_reactions_data['data']
+
+                    try:
+                        reactions_url = json_reactions_data['paging']['next']
+                    except KeyError:
+                        logging.info('Post: {},  Nuber of reactions: {}'.format(a_post['id'], len(a_post['reactions'])))
+                        break
+                #-----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+                json.dump(a_post, outfile, indent=4)
+
+            num_posts += len(json_feed_data['data'])
             try:
-                url = json_data['paging']['next']
+                url = json_feed_data['paging']['next']
             except KeyError:
                 logging.info('Scrapped posts: {}'.format(num_posts))
                 break
-
             print("-----------------------------NEXT PAGE----------------------------------------")
-    
+        outfile.write(']')
 
 # DEBUG
 #print(request_handler(GRAPH_API))
