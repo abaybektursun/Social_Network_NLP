@@ -85,8 +85,8 @@ def traverse_posts(page_id, get_reactions=False):
             json_feed_data = json.loads(data)
             for a_p in json_feed_data['data'][1:]:
                 a_post = a_p.copy()
-                a_post['comments'] = []
-                a_post['reactions'] =[]
+                a_post['comments']        = []
+                a_post['reactions']       = []
                 a_post['reactions_count'] = {}
                 outfile.write(',')
 
@@ -105,8 +105,8 @@ def traverse_posts(page_id, get_reactions=False):
                         break
                 #-----------------------------------------------------------------------------------------------------------------------------------------------
                 
+                #------- Reactions -----------------------------------------------------------------------------------------------------------------------------
                 if get_reactions:
-                    #------- Reactions -----------------------------------------------------------------------------------------------------------------------------
                     req_type = 'reactions'
                     reactions_url = '{root}/{post_id}/{req}/?access_token={token}'.format(root=GRAPH_API,post_id=a_post['id'],req=req_type,token=token)
                     while True:
@@ -119,15 +119,15 @@ def traverse_posts(page_id, get_reactions=False):
                         except KeyError:
                             logging.info('Post: {},  Nuber of reactions: {}'.format(a_post['id'], len(a_post['reactions'])))
                             break
-                    #-----------------------------------------------------------------------------------------------------------------------------------------------
+                #-----------------------------------------------------------------------------------------------------------------------------------------------
 
                 #------- Reactions Count -----------------------------------------------------------------------------------------------------------------------
                 reactions_count_url = '{root}/{post_id}/?fields=reactions.type(LIKE).limit(0).summary(total_count).as(reactions_like),'        \
                                                              + 'reactions.type(LOVE).limit(0).summary(total_count).as(reactions_love),'        \
                                                              + 'reactions.type(WOW).limit(0).summary(total_count).as(reactions_wow),'          \
-                                                             + 'reactions.type(HAHA).limit(0).summary(total_count).as(reactions_haha),'         \
-                                                             + 'reactions.type(SAD).limit(0).summary(total_count).as(reactions_sad),'           \
-                                                             + 'reactions.type(ANGRY).limit(0).summary(total_count).as(reactions_angry),'       \
+                                                             + 'reactions.type(HAHA).limit(0).summary(total_count).as(reactions_haha),'        \
+                                                             + 'reactions.type(SAD).limit(0).summary(total_count).as(reactions_sad),'          \
+                                                             + 'reactions.type(ANGRY).limit(0).summary(total_count).as(reactions_angry),'      \
                                                              + 'reactions.type(THANKFUL).limit(0).summary(total_count).as(reactions_thankful)' \
                                                              + '&access_token={token}'
                 reactions_count_url       = reactions_count_url.format(root=GRAPH_API,post_id=a_post['id'],token=token)
@@ -135,9 +135,8 @@ def traverse_posts(page_id, get_reactions=False):
                 json_reactions_count_data = json.loads(reactions_count)
                 a_post['reactions_count'] = json_reactions_count_data.copy()
                 #-----------------------------------------------------------------------------------------------------------------------------------------------
-
-
                 json.dump(a_post, outfile, indent=4)
+
 
             num_posts += len(json_feed_data['data'])
             try:
