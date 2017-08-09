@@ -8,16 +8,22 @@ import time
 import csv
 import os.path
 
-SOURCE_PATH = os.path.dirname(os.path.abspath(__file__))
+SOURCE_PATH   = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE_NAME = 'fb_scrapper_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
-REQ_ATTEMPTS = 0
-TIMEOUT = 0
+REQ_ATTEMPTS  = 0
+TIMEOUT       = 0
+LOGS_FOLDER   = 'logs'
+EXPORT_CSV    = False
+EXPORT_JSON   = False
 
 # Right working directory
 os.chdir(SOURCE_PATH)
 
 # Set up logs
-logging.basicConfig(format='%(levelname)s\t%(asctime)s\t%(message)s', filename=LOG_FILE_NAME, datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+if not os.path.exists(LOGS_FOLDER):
+    os.makedirs(LOGS_FOLDER)
+
+logging.basicConfig(format='%(levelname)s\t%(asctime)s\t%(message)s', filename='{}/{}'.format(LOGS_FOLDER,LOG_FILE_NAME), datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 logging.info('Application has started')
 
 # Get FB access token
@@ -29,10 +35,13 @@ token = '{}|{}'.format(fb_configs['app']['id'], fb_configs['app']['secret'])
 configs = configparser.ConfigParser()
 configs.read('config.ini')
 REQ_ATTEMPTS = int(configs['default']['REQ_ATTEMPTS'])
-TIMEOUT = int(configs['default']['TIMEOUT'])
+TIMEOUT      = int(configs['default']['TIMEOUT'])
+EXPORT_CSV   = configs['default'].getboolean('EXPORT_CSV' )
+EXPORT_JSON  = configs['default'].getboolean('EXPORT_JSON')
+logging.info('Reqeust Attempts:{}, Timeout (secs): {}, Export CSV?: {}, Export JSON?: {}'.format(REQ_ATTEMPTS, TIMEOUT, EXPORT_CSV, EXPORT_JSON))
 
 def request_handler(url):
-    global REQ_ATTEMPTS; global TIMEOUT
+    global REQ_ATTEMPTS; global TIMEOUT; global logging
     req = urllib.request.Request(url); err = ''
     for i in range(REQ_ATTEMPTS):
         try: 
@@ -70,15 +79,16 @@ def traverse_posts(page_id, get_reactions=False):
                 break
 
         # Write comments to csv file
-        for a_comment in a_post['comments']:
-            csv_comments_writer.writerow([
-                a_post['id'],
-                a_comment['id'],
-                a_comment['created_time'],
-                a_comment['from'].get('name',''),
-                a_comment['from']['id'],
-                a_comment['message']
-            ])
+        if EXPORT_CSV:
+            for a_comment in a_post['comments']:
+                csv_comments_writer.writerow([
+                    a_post['id'],
+                    a_comment['id'],
+                    a_comment['created_time'],
+                    a_comment['from'].get('name',''),
+                    a_comment['from']['id'],
+                    a_comment['message']
+                ])
         #-----------------------------------------------------------------------------------------------------------------------------------------------
         
         #------- Reactions -----------------------------------------------------------------------------------------------------------------------------
@@ -113,10 +123,10 @@ def traverse_posts(page_id, get_reactions=False):
         #-----------------------------------------------------------------------------------------------------------------------------------------------
         
         # Write a record to json file
-        json.dump(a_post, json_file, indent=4) 
+        if EXPORT_JSON: json.dump(a_post, json_file, indent=4) 
         
         # Write a record to CSV file
-        csv_writer.writerow([  
+        if EXPORT_CSV: csv_writer.writerow([  
             a_post['id'],
             a_post.get('from','')['id'],
             a_post.get('from','')['name'],
@@ -146,7 +156,8 @@ def traverse_posts(page_id, get_reactions=False):
     with open('DXC_tech_page.json', 'w') as json_file, open('DXC_tech_page.csv', 'w') as csv_file, open('DXC_tech_page_comments.csv', 'w') as csv_comments_file:
         csv_writer = csv.writer(csv_file)
         csv_comments_writer = csv.writer(csv_comments_file)
-        json_file.write('[')
+        
+        if EXPORT_JSON: json_file.write('[')
 
         # Process 1st post separately to avoid branching
         data = request_handler(url)
@@ -169,7 +180,7 @@ def traverse_posts(page_id, get_reactions=False):
             json_feed_data = json.loads(data)
             for a_p in json_feed_data['data'][1:]:
                 a_post = a_p.copy()
-                json_file.write(',')
+                if EXPORT_JSON: json_file.write(',')
                 a_post_process()
 
             num_posts += len(json_feed_data['data'])
@@ -179,7 +190,7 @@ def traverse_posts(page_id, get_reactions=False):
                 logging.info('Scrapped posts: {}'.format(num_posts))
                 break
             print("-----------------------------NEXT PAGE----------------------------------------")
-        json_file.write(']')
+        if EXPORT_JSON: json_file.write(']')
 
 # DEBUG
 #print(request_handler(GRAPH_API))
