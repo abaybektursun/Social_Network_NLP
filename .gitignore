@@ -2,3 +2,5 @@
 *.log
 *.json
 *.zip
+*.csv
+PoC/
