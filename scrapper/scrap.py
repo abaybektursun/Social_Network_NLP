@@ -157,7 +157,7 @@ def traverse_posts(page_id, get_reactions=False):
         csv_writer = csv.writer(csv_file)
         csv_comments_writer = csv.writer(csv_comments_file)
         
-        if EXPORT_JSON: json_file.write('[')
+        json_file.write('[')
 
         # Process 1st post separately to avoid branching
         data = request_handler(url)
@@ -180,7 +180,7 @@ def traverse_posts(page_id, get_reactions=False):
             json_feed_data = json.loads(data)
             for a_p in json_feed_data['data'][1:]:
                 a_post = a_p.copy()
-                if EXPORT_JSON: json_file.write(',')
+                json_file.write(',')
                 a_post_process()
 
             num_posts += len(json_feed_data['data'])
@@ -190,7 +190,7 @@ def traverse_posts(page_id, get_reactions=False):
                 logging.info('Scrapped posts: {}'.format(num_posts))
                 break
             print("-----------------------------NEXT PAGE----------------------------------------")
-        if EXPORT_JSON: json_file.write(']')
+        json_file.write(']')
 
 # DEBUG
 #print(request_handler(GRAPH_API))
