@@ -160,5 +160,33 @@ with tf.Session(
     )
 ) as session:
     tf.global_variables_initializer().run()
-    #tf.initialize_all_variables().run()
+    print('Initialized')
+    average_loss = 0
+    for step in range(num_steps):
+        batch_data, batch_labels = generate_batch(batch_size, num_skips, skip_window)
+        feed_dict = {
+            train_dataset : batch_data, 
+            train_labels : batch_labels
+        }
+        _, l = session.run([optimizer, loss], feed_dict=feed_dict)
+        average_loss += l
+        if step % 2000 == 0:
+            if step > 0:
+                average_loss = average_loss / 2000
+            # The average loss is an estimate of the loss over the last 2000 batches.
+            print('Average loss at step %d: %f' % (step, average_loss))
+            average_loss = 0
+        # note that this is expensive (~20% slowdown if computed every 500 steps)
+        if step % 10000 == 0:
+            sim = similarity.eval()
+            for i in xrange(valid_size):
+                valid_word = key_reverse_hash_map[valid_examples[i]]
+                top_k = 8 # number of nearest neighbors
+                nearest = (-sim[i, :]).argsort()[1:top_k+1]
+                log = 'Nearest to %s:' % valid_word
+                for k in xrange(top_k):
+                    close_word = key_reverse_hash_map[nearest[k]]
+                    log = '%s %s,' % (log, close_word)
+                print(log)
+    final_embeddings = normalized_embeddings.eval()
 
