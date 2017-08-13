@@ -57,7 +57,7 @@ def generate_batch(batch_size, num_skips, skip_window):
     labels = np.ndarray(shape=(batch_size, 1), dtype=np.int32)
     slide_window_size = (2 * skip_window) +  1
     #                       ^                ^
-    #       Words around the target       Target Word   
+    #       Words around the target       Center Word   
     #---------------------------------------------------------
     
     # Populate the sliding window
@@ -78,16 +78,87 @@ def generate_batch(batch_size, num_skips, skip_window):
         data_index = (data_index + 1) % len(data)
     return batch, labels
 
-print('data:', [key_reverse_hash_map[di] for di in data[:8]])
+# Debug
+#print('data:', [key_reverse_hash_map[di] for di in data[:8]])
 
-for num_skips, skip_window in [(2, 1), (4, 2)]:
-    data_index = 0
-    batch, labels = generate_batch(batch_size=8, num_skips=num_skips, skip_window=skip_window)
-    print('\nwith num_skips = %d and skip_window = %d:' % (num_skips, skip_window))
-    print('    batch:', [key_reverse_hash_map[bi] for bi in batch])
-    print('    labels:', [key_reverse_hash_map[li] for li in labels.reshape(8)])
+#--------------------------------------------------------------------------------
+batch_size = 128
+embedding_size = 128 # Dimension of the embedding vector.
+skip_window = 1 # How many words to consider left and right.
+num_skips = 2 # How many times to reuse an input to generate a label.
+# We pick a random validation set to sample nearest neighbors. here we limit the
+# validation samples to the words that have a low numeric ID, which by
+# construction are also the most frequent. 
+valid_size     = 16 # Random set of words to evaluate similarity on.
+valid_window   = 100 # Only pick dev samples in the head of the distribution.
+num_sampled    = 64 # Number of negative examples to sample.
+valid_examples = np.array(
+    random.sample( range(valid_window), valid_size )
+)
+#--------------------------------------------------------------------------------
 
+# Daddy in da house
+graph = tf.Graph()
 
+with graph.as_default(), tf.device('/gpu:0'): 
+    # Input data
+    train_dataset = tf.placeholder(tf.int32, shape=[batch_size])
+    train_labels  = tf.placeholder(tf.int32, shape=[batch_size,1])
+    valid_dataset = tf.constant(valid_examples, dtype=tf.int32)
 
+    # Variables
+    embeddings = tf.Variable(
+        tf.random_uniform(  [VOCAB_SIZE, embedding_size], -1.0, 1.0  )
+    ) # V x N
+    softmax_weights = tf.Variable(
+        tf.truncated_normal([VOCAB_SIZE, embedding_size], stddev=1.0 / np.sqrt(embedding_size))
+    ) # V x N
+    softmax_biases = tf.Variable(tf.zeros([VOCAB_SIZE]))
+    
 
+    # Model.
+    # Look up embeddings for inputs.
+    embed = tf.nn.embedding_lookup(embeddings, train_dataset)
+    # Compute the softmax loss, using a sample of the negative labels each time.
+    
+    # Debug
+    print("softmax_weights {}".format(softmax_weights)) 
+    print("softmax_biases  {}".format(softmax_biases))
+    print("embed           {}".format(embed))
+    print("train_labels    {}".format(train_labels))
+    print("num_sampled     {}".format(num_sampled))
+    print("VOCAB_SIZE      {}".format(VOCAB_SIZE))
+    
+    
+    loss = tf.reduce_mean(
+        tf.nn.sampled_softmax_loss(
+            weights=softmax_weights, 
+            biases=softmax_biases, 
+            inputs=embed,
+            labels=train_labels, 
+            num_sampled=num_sampled, 
+            num_classes=VOCAB_SIZE
+        )
+    )
+
+    # Optimizer.
+    optimizer = tf.train.AdagradOptimizer(1.0).minimize(loss)
+    
+    # Compute the similarity between minibatch examples and all embeddings.
+    # We use the cosine distance:
+    norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
+    normalized_embeddings = embeddings / norm
+    valid_embeddings = tf.nn.embedding_lookup(normalized_embeddings, valid_dataset)
+    similarity = tf.matmul(valid_embeddings, tf.transpose(normalized_embeddings))
+
+num_steps = 100001
+with tf.Session(
+    graph=graph, 
+    config=tf.ConfigProto(
+        allow_soft_placement=True, 
+        log_device_placement=True
+    )
+) as session:
+    tf.global_variables_initializer().run()
+    #tf.initialize_all_variables().run()
 
