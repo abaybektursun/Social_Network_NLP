@@ -1,10 +1,12 @@
 from collections import Counter
+from matplotlib  import pylab
 
 import re
 import random
 import collections
 import numpy as np
 import tensorflow as tf
+from sklearn.manifold import TSNE
 
 
 TXT_FILE_NAME = 'text8'
@@ -52,12 +54,12 @@ def generate_batch(batch_size, num_skips, skip_window):
     #----------------------------------
     
     # Declare and init ---------------------------------------
-    buffer = collections.deque(maxlen=slide_window_size) 
     batch  = np.ndarray(shape=(batch_size), dtype=np.int32)
     labels = np.ndarray(shape=(batch_size, 1), dtype=np.int32)
     slide_window_size = (2 * skip_window) +  1
     #                       ^                ^
     #       Words around the target       Center Word   
+    buffer = collections.deque(maxlen=slide_window_size) 
     #---------------------------------------------------------
     
     # Populate the sliding window
@@ -179,14 +181,34 @@ with tf.Session(
         # note that this is expensive (~20% slowdown if computed every 500 steps)
         if step % 10000 == 0:
             sim = similarity.eval()
-            for i in xrange(valid_size):
+            for i in range(valid_size):
                 valid_word = key_reverse_hash_map[valid_examples[i]]
                 top_k = 8 # number of nearest neighbors
                 nearest = (-sim[i, :]).argsort()[1:top_k+1]
                 log = 'Nearest to %s:' % valid_word
-                for k in xrange(top_k):
+                for k in range(top_k):
                     close_word = key_reverse_hash_map[nearest[k]]
                     log = '%s %s,' % (log, close_word)
                 print(log)
     final_embeddings = normalized_embeddings.eval()
+
+
+num_points = 400
+
+tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
+two_d_embeddings = tsne.fit_transform(final_embeddings[1:num_points+1, :])
+
+def plot(embeddings, labels):
+    assert embeddings.shape[0] >= len(labels), 'More labels than embeddings'
+    pylab.figure(figsize=(15,15))  # in inches
+    for i, label in enumerate(labels):
+        x, y = embeddings[i,:]
+        pylab.scatter(x, y)
+        pylab.annotate(label, xy=(x, y), xytext=(5, 2), textcoords='offset points',
+                     ha='right', va='bottom')
+    pylab.show()
+
+words = [key_reverse_hash_map[i] for i in range(1, num_points+1)]
+plot(two_d_embeddings, words)
+
 
