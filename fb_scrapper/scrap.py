@@ -153,7 +153,7 @@ def traverse_posts(page_id, get_reactions=False):
     url = '{root}/{page}/{req}/?fields={fields}&access_token={token}'.format(root=GRAPH_API,page=page,req=req_type,fields=fields,token=token) 
 
     num_posts = 0
-    with open('DXC_tech_page.json', 'w') as json_file, open('DXC_tech_page.csv', 'w') as csv_file, open('DXC_tech_page_comments.csv', 'w') as csv_comments_file:
+    with open('DXC_tech_page.json', 'w') as json_file, open('DXC_tech_page.csv', 'w') as csv_file, open('DXC_tech_page_comments.csv', 'w') as csv_comments_file:    
         csv_writer = csv.writer(csv_file)
         csv_comments_writer = csv.writer(csv_comments_file)
         

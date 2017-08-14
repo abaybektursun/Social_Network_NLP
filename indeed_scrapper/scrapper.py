@@ -2,12 +2,13 @@ from datetime      import datetime, date, time
 from html.entities import name2codepoint
 from bs4           import BeautifulSoup
 from html.parser   import HTMLParser
-
+from unidecode     import unidecode
 
 import urllib.request
 import configparser
 import os.path
 import logging
+import codecs
 import json
 import time
 import csv
@@ -20,6 +21,7 @@ TIMEOUT       = 1
 LOGS_FOLDER   = 'logs'
 EXPORT_CSV    = False
 EXPORT_JSON   = False
+COMPANY_NAME  = 'Dxc-Technology'
 
 # Right working directory
 os.chdir(SOURCE_PATH)
@@ -31,6 +33,15 @@ if not os.path.exists(LOGS_FOLDER):
 logging.basicConfig(format='%(levelname)s\t%(asctime)s\t%(message)s', filename='{}/{}'.format(LOGS_FOLDER,LOG_FILE_NAME), datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 logging.info('Application has started')
 
+
+# Configs
+configs = configparser.ConfigParser()
+configs.read('config.ini')
+REQ_ATTEMPTS = int(configs['default']['REQ_ATTEMPTS'])
+TIMEOUT      = int(configs['default']['TIMEOUT'])
+EXPORT_CSV   = configs['default'].getboolean('EXPORT_CSV' )
+EXPORT_JSON  = configs['default'].getboolean('EXPORT_JSON')
+logging.info('Reqeust Attempts:{}, Timeout (secs): {}, Export CSV?: {}, Export JSON?: {}'.format(REQ_ATTEMPTS, TIMEOUT, EXPORT_CSV, EXPORT_JSON))
 
 def request_handler(url): 
     global REQ_ATTEMPTS; global TIMEOUT; global logging
@@ -46,8 +57,6 @@ def request_handler(url):
             time.sleep(2)
     logging.error("{}:{}".format(url,err))
     return None
-
-
 
 #****************************************************************************************************
 def parse_score_table(table):
@@ -65,30 +74,72 @@ def parse_score_table(table):
     return score_dict
 #****************************************************************************************************
 
-a_document = str(request_handler('https://www.indeed.com/cmp/Dxc-Technology/reviews?fcountry=ALL&start=0'))
-soup = BeautifulSoup(a_document, 'html.parser')
-review_containers = soup.find_all(attrs={"class": "cmp-review-container"})
+#.......................................................................................................................................................
+onetime_use_req = str(request_handler('https://www.indeed.com/cmp/{comp}/reviews?fcountry=ALL&start={page_num}'.format(comp=COMPANY_NAME,page_num='0')))
+soup = BeautifulSoup(onetime_use_req, 'html.parser')
+total_num_reviews = int(re.sub("\D", "", soup.find(attrs={"class":"cmp-filter-result"}).string))
+#.......................................................................................................................................................
 
-for a_review_container in review_containers:
-    review_id = a_review_container.find(attrs={"class": "cmp-review"}).get('data-tn-entityid')
-    overall_review_score = a_review_container.find(attrs={"itemprop": "ratingValue"}).get('content')
-    scores_dict = parse_score_table(a_review_container.find(attrs={"class": "cmp-ratings-expanded"}))
-    review_title = ''; poster_role = ''
-    for a_span in a_review_container.find(attrs={"class":"cmp-review-title"}).children:
-        if a_span.get("itemprop") == "name":
-            review_title = a_span.string
-        elif a_span.get("itemprop") == "author":
-            poster_role = a_span.find('meta').get('content')
+with open('reviews.json', 'w', encoding='utf-8') as json_file, open('reviews.csv', 'w') as csv_file:  
+    json_file.write('[')
+    for page_num in [x for x in range(total_num_reviews) if x % 20 == 0]:
+        a_document = str(request_handler('https://www.indeed.com/cmp/{comp}/reviews?fcountry=ALL&start={page_num}'.format(comp=COMPANY_NAME,page_num=page_num)))
+        #if not a_document: continue
+        soup = BeautifulSoup(a_document, 'html.parser')
+        review_containers = soup.find_all(attrs={"class": "cmp-review-container"})
+        reviews_list = []
+     
+        for a_review_container in review_containers:
+            if str(a_review_container.parent.get("id")) == 'cmp-review-featured-container': continue
+        
+            review_id            = a_review_container.find(attrs={"class": "cmp-review"}).get('data-tn-entityid')
+            overall_review_score = a_review_container.find(attrs={"itemprop": "ratingValue"}).get('content')
+            poster_location      = a_review_container.find(attrs={"class":"cmp-reviewer-job-location"})
+            if poster_location:
+                poster_location = poster_location.string
+            post_date            = a_review_container.find(attrs={"class":"cmp-review-date-created"}).string
+            scores_dict = parse_score_table(a_review_container.find(attrs={"class": "cmp-ratings-expanded"}))
+            
+            review_title = ''; poster_role = ''; status = ''; review_text = u''
+           
+            for a_child in a_review_container.find(attrs={"class":"cmp-review-text"}).children:
+                review_text += str(a_child.string or ' ')
+            
+            for a_child in a_review_container.find(attrs={"class":'cmp-reviewer-job-title'}):
+                if a_child.name == 'span': continue
+                status = a_child.string.replace('–','').replace('(','').replace(')','').strip()
+
+        
+            for a_span in a_review_container.find(attrs={"class":"cmp-review-title"}).children:
+                if a_span.get("itemprop") == "name":
+                    review_title = a_span.string
+                elif a_span.get("itemprop") == "author":
+                    poster_role = a_span.find('meta').get('content')
+            
+            a_review = { 
+                "review_id": review_id,
+                "overall_review_score": overall_review_score,
+                "scores": scores_dict,
+                "poster_role": poster_role,
+                "review_title": review_title,
+                "poster_status": status,
+                "psoter_location":poster_location,
+                "post_date": post_date,
+                "review_text": review_text
+            }
+        
+            reviews_list.append(a_review)
+            #print(a_review)
+            #print("--------------------------------------------------------------")
+        logging.info('# processed reviews from the page: {}'.format(len(reviews_list)))
     
+        #json_data = json.dumps(reviews_list)
+        
+        if not page_num == 0: json_file.write(',')
+        json.dump(reviews_list[0], json_file, indent=4, ensure_ascii=False) 
+        for a_review_dict in reviews_list[1:]:
+            json_file.write(',') 
+            json.dump(a_review_dict, json_file, indent=4, ensure_ascii=False)
+    
+    json_file.write(']')
 
-    a_review = { 
-        "review_id": review_id,
-        "overall_review_score": overall_review_score,
-        "scores": scores_dict,
-        "poster_role": poster_role,
-        "review_title": review_title
-    }
-    print(a_review)
-    print("--------------------------------------------------------------")
-
-print("reviews: {}".format(len(review_containers)))
