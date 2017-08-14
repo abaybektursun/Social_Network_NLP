@@ -31,7 +31,7 @@ logging.basicConfig(format='%(levelname)s\t%(asctime)s\t%(message)s', filename='
 logging.info('Application has started')
 
 
-def request_handler(url): 
+def request_handler(url):
     global REQ_ATTEMPTS; global TIMEOUT; global logging
     req = urllib.request.Request(url); err = ''
     for i in range(REQ_ATTEMPTS):
@@ -46,24 +46,15 @@ def request_handler(url):
     logging.error("{}:{}".format(url,err))
     return None
 
-
-
-#****************************************************************************************************
-def parse_score_table(table):
-    score_dict = {}
-    for a_tr in table.find_all('tr'):
-        for a_td in a_tr.children:
-            print(a_td)
-#****************************************************************************************************
-
 a_document = str(request_handler('https://www.indeed.com/cmp/Dxc-Technology/reviews?fcountry=ALL&start=0'))
-soup = BeautifulSoup(a_document, 'html.parser')
-review_containers = soup.find_all(attrs={"class": "cmp-review-container"})
 
+soup = BeautifulSoup(a_document, 'html.parser')
+
+review_containers = soup.find_all(attrs={"class": "cmp-review-container"})
 for a_review_container in review_containers:
     review_id = a_review_container.find(attrs={"class": "cmp-review"}).get('data-tn-entityid')
     overall_review_score = a_review_container.find(attrs={"itemprop": "ratingValue"}).get('content')
-    scores_dict = parse_score_table(a_review_container.find(attrs={"class": "cmp-ratings-expanded"}))
+    scores_dict = parse_score_table(a_review_container.find_all(attrs={"class": "cmp-ratings-expanded"}))
     
     a_review = { 
         "review_id": review_id,
