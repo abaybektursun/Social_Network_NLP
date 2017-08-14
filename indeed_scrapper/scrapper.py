@@ -73,11 +73,20 @@ for a_review_container in review_containers:
     review_id = a_review_container.find(attrs={"class": "cmp-review"}).get('data-tn-entityid')
     overall_review_score = a_review_container.find(attrs={"itemprop": "ratingValue"}).get('content')
     scores_dict = parse_score_table(a_review_container.find(attrs={"class": "cmp-ratings-expanded"}))
+    review_title = ''; poster_role = ''
+    for a_span in a_review_container.find(attrs={"class":"cmp-review-title"}).children:
+        if a_span.get("itemprop") == "name":
+            review_title = a_span.string
+        elif a_span.get("itemprop") == "author":
+            poster_role = a_span.find('meta').get('content')
     
+
     a_review = { 
         "review_id": review_id,
         "overall_review_score": overall_review_score,
-        "scores": scores_dict
+        "scores": scores_dict,
+        "poster_role": poster_role,
+        "review_title": review_title
     }
     print(a_review)
     print("--------------------------------------------------------------")
