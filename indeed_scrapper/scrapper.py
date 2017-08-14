@@ -11,6 +11,7 @@ import logging
 import json
 import time
 import csv
+import re
 
 SOURCE_PATH   = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE_NAME = 'indeed_scrapper_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
@@ -52,8 +53,16 @@ def request_handler(url):
 def parse_score_table(table):
     score_dict = {}
     for a_tr in table.find_all('tr'):
-        for a_td in a_tr.children:
-            print(a_td)
+        buffer_score = ['',0] #[type,score]
+        for a_td in a_tr.children:     
+            if a_td.get('class') == ['cmp-star-cell']:
+                # Get the score
+                buffer_score[1] = int(float(re.findall(r"[-+]?\d*\.\d+|\d+", a_td.find(attrs={"class": 'cmp-rating-inner rating'}).get('style'))[0])) / 20
+            else:
+                # Get the score type
+                buffer_score[0] = a_td.string.replace(' ', '_').replace('/','_')
+        score_dict[buffer_score[0]] = buffer_score[1]
+    return score_dict
 #****************************************************************************************************
 
 a_document = str(request_handler('https://www.indeed.com/cmp/Dxc-Technology/reviews?fcountry=ALL&start=0'))
@@ -67,7 +76,8 @@ for a_review_container in review_containers:
     
     a_review = { 
         "review_id": review_id,
-        "overall_review_score": overall_review_score
+        "overall_review_score": overall_review_score,
+        "scores": scores_dict
     }
     print(a_review)
     print("--------------------------------------------------------------")
