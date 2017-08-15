@@ -75,6 +75,18 @@ def parse_score_table(table):
     return score_dict
 #****************************************************************************************************
 
+
+def manual_string(tag):
+    str_out = ''; do = True
+    if str(tag)[0] == '<': do = False
+    for l in str(tag)[1:]:
+        if l == '<': do = False
+        if do:
+            str_out += l
+        else:
+            if l == '>': do = True
+    return str_out
+
 #.......................................................................................................................................................
 onetime_use_req = str(request_handler('https://www.indeed.com/cmp/{comp}/reviews?fcountry=ALL&start={page_num}'.format(comp=COMPANY_NAME,page_num='0')))
 soup = BeautifulSoup(onetime_use_req, 'html.parser')
@@ -104,6 +116,11 @@ with open('reviews.json', 'w', encoding='utf-8') as json_file, open('reviews.csv
             
             review_title = ''; poster_role = ''; status = ''; review_text = u''
            
+            pros = a_review_container.find(attrs={"class":"cmp-review-pro-text"})
+            cons = a_review_container.find(attrs={"class":"cmp-review-con-text"})
+            if pros: pros = pros.string
+            if cons: cons = manual_string(cons)
+             
             for a_child in a_review_container.find(attrs={"class":"cmp-review-text"}).children:
                 review_text += str(a_child.string or ' ')
             
@@ -118,6 +135,8 @@ with open('reviews.json', 'w', encoding='utf-8') as json_file, open('reviews.csv
                 elif a_span.get("itemprop") == "author":
                     poster_role = a_span.find('meta').get('content')
             
+
+            
             a_review = { 
                 "review_id": review_id,
                 "overall_review_score": overall_review_score,
@@ -127,7 +146,9 @@ with open('reviews.json', 'w', encoding='utf-8') as json_file, open('reviews.csv
                 "poster_status": status,
                 "psoter_location":poster_location,
                 "post_date": post_date,
-                "review_text": review_text
+                "review_text": review_text,
+                "pros": pros,
+                "cons": cons
             }
         
             reviews_list.append(a_review)

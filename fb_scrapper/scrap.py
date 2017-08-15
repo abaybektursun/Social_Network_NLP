@@ -5,6 +5,7 @@ import configparser
 import logging
 import json
 import time
+import sys
 import csv
 import os.path
 
@@ -23,9 +24,6 @@ os.chdir(SOURCE_PATH)
 if not os.path.exists(LOGS_FOLDER):
     os.makedirs(LOGS_FOLDER)
 
-logging.basicConfig(format='%(levelname)s\t%(asctime)s\t%(message)s', filename='{}/{}'.format(LOGS_FOLDER,LOG_FILE_NAME), datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
-logging.info('Application has started')
-
 # Get FB access token
 fb_configs = configparser.ConfigParser()
 fb_configs.read('key.fbtoken')
@@ -39,7 +37,14 @@ REQ_ATTEMPTS = int(configs['default']['REQ_ATTEMPTS'])
 TIMEOUT      = int(configs['default']['TIMEOUT'])
 EXPORT_CSV   = configs['default'].getboolean('EXPORT_CSV' )
 EXPORT_JSON  = configs['default'].getboolean('EXPORT_JSON')
+
+if len(sys.argv) == 2:
+    page = sys.argv[1]
+
+logging.basicConfig(format='%(levelname)s\t%(asctime)s\t%(message)s', filename='{}/{}_{}'.format(LOGS_FOLDER,page,LOG_FILE_NAME), datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+logging.info('Application has started')
 logging.info('Reqeust Attempts:{}, Timeout (secs): {}, Export CSV?: {}, Export JSON?: {}'.format(REQ_ATTEMPTS, TIMEOUT, EXPORT_CSV, EXPORT_JSON))
+
 
 def request_handler(url):
     global REQ_ATTEMPTS; global TIMEOUT; global logging
@@ -153,7 +158,7 @@ def traverse_posts(page_id, get_reactions=False):
     fields='from,message,link,tags,object_attachment,created_time,description'
     url = '{root}/{page}/{req}/?fields={fields}&access_token={token}'.format(root=GRAPH_API,page=page,req=req_type,fields=fields,token=token) 
     num_posts = 0
-    with open(page+'_page.json', 'w') as json_file, open(page+'_page.csv', 'w') as csv_file, open(page+'_page_comments.csv', 'w') as csv_comments_file:    
+    with open('data/'+page+'_page.json', 'w') as json_file, open('data/'+page+'_page.csv', 'w') as csv_file, open('data/'+page+'_page_comments.csv', 'w') as csv_comments_file:    
         csv_writer = csv.writer(csv_file)
         csv_comments_writer = csv.writer(csv_comments_file)
         

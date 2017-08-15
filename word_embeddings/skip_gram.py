@@ -15,7 +15,7 @@ from sklearn.manifold import TSNE
 
 
 TXT_FILE_NAME = 'data.txt'
-VOCAB_SIZE    = 8000
+VOCAB_SIZE    = 5000
 SOURCE_PATH   = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE_NAME = 'skip_gram_train_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
 LOGS_FOLDER   = 'logs'
@@ -105,7 +105,7 @@ def generate_batch(batch_size, num_skips, skip_window):
 #--------------------------------------------------------------------------------
 batch_size = 128
 embedding_size = 128 # Dimension of the embedding vector.
-skip_window = 1 # How many words to consider left and right.
+skip_window = 2 # How many words to consider left and right.
 num_skips = 2 # How many times to reuse an input to generate a label.
 # We pick a random validation set to sample nearest neighbors. here we limit the
 # validation samples to the words that have a low numeric ID, which by
@@ -235,4 +235,4 @@ def plot(embeddings, labels):
 words = [key_reverse_hash_map[i] for i in range(1, num_points+1)]
 plot(two_d_embeddings, words)
 
-
+print("END!!")
