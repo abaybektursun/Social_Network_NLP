@@ -1,10 +1,15 @@
+from datetime    import datetime, date, time
 from collections import Counter
 from matplotlib  import pylab
 
+import os
 import re
+import time
 import random
+import logging
 import collections
 import numpy as np
+import configparser
 import tensorflow as tf
 from sklearn.manifold import TSNE
 
@@ -169,7 +174,7 @@ with graph.as_default(), tf.device('/gpu:0'):
     similarity = tf.matmul(valid_embeddings, tf.transpose(normalized_embeddings))
 
 # Create a saver.
-saver = tf.train.Saver(embeddings,softmax_weights,softmax_biases)
+saver = tf.train.Saver([embeddings,softmax_weights,softmax_biases])
 
 num_steps = 100001
 with tf.Session(
