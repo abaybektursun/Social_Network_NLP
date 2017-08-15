@@ -15,7 +15,7 @@ from sklearn.manifold import TSNE
 
 
 TXT_FILE_NAME = 'data.txt'
-VOCAB_SIZE    = 10000
+VOCAB_SIZE    = 8000
 SOURCE_PATH   = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE_NAME = 'skip_gram_train_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
 LOGS_FOLDER   = 'logs'
@@ -35,7 +35,6 @@ logging.info('Application has started')
 with open(TXT_FILE_NAME) as txt_file:
     words = tf.compat.as_str(txt_file.read()).split()
 
-#TODO remove meaningless common words: the, and, a, ect.
 
 pre_vocab = [['NULL', -1]] + Counter(words).most_common(VOCAB_SIZE - 1)
 
@@ -176,7 +175,7 @@ with graph.as_default(), tf.device('/gpu:0'):
 # Create a saver.
 saver = tf.train.Saver([embeddings,softmax_weights,softmax_biases])
 
-num_steps = 100001
+num_steps = 1000001
 with tf.Session(
     graph=graph, 
     config=tf.ConfigProto(

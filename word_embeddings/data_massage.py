@@ -59,6 +59,6 @@ with open(out_name, 'w') as out_file:
             reader = csv.reader(csv_file)
             comment_reader = csv.reader(comments_csv_file)
             for row in reader:
-                out_file.write( remove_common_words(re.sub("[^a-zA-Z]+"," ",row[3])) )
+                out_file.write( remove_common_words( re.sub("[^a-zA-Z]+"," ",re.sub(r'^https?:\/\/.*[\r\n]*', '', row[3], flags=re.MULTILINE))) )
             for row in comment_reader:
-                out_file.write( remove_common_words(re.sub("[^a-zA-Z]+"," ",row[5])) )
+                out_file.write( remove_common_words( re.sub("[^a-zA-Z]+"," ",re.sub(r'^https?:\/\/.*[\r\n]*', '', row[3], flags=re.MULTILINE))) )
