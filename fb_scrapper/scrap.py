@@ -34,6 +34,7 @@ token = '{}|{}'.format(fb_configs['app']['id'], fb_configs['app']['secret'])
 # Configs
 configs = configparser.ConfigParser()
 configs.read('config.ini')
+page = configs['default']['page_id']
 REQ_ATTEMPTS = int(configs['default']['REQ_ATTEMPTS'])
 TIMEOUT      = int(configs['default']['TIMEOUT'])
 EXPORT_CSV   = configs['default'].getboolean('EXPORT_CSV' )
@@ -151,9 +152,8 @@ def traverse_posts(page_id, get_reactions=False):
     req_type = 'feed'
     fields='from,message,link,tags,object_attachment,created_time,description'
     url = '{root}/{page}/{req}/?fields={fields}&access_token={token}'.format(root=GRAPH_API,page=page,req=req_type,fields=fields,token=token) 
-
     num_posts = 0
-    with open('DXC_tech_page.json', 'w') as json_file, open('DXC_tech_page.csv', 'w') as csv_file, open('DXC_tech_page_comments.csv', 'w') as csv_comments_file:    
+    with open(page+'_page.json', 'w') as json_file, open(page+'_page.csv', 'w') as csv_file, open(page+'_page_comments.csv', 'w') as csv_comments_file:    
         csv_writer = csv.writer(csv_file)
         csv_comments_writer = csv.writer(csv_comments_file)
         
@@ -204,7 +204,10 @@ GRAPH_API = 'https://graph.facebook.com/v2.10'
 #page = '762580480426589'
 
 # FB Page: DXC Technology
-page = 'DXCTechnology'
+#page = 'DXCTechnology'
+
+# FB: page: StealYoWaifu
+#page = 'StealYoWaifu'
 
 traverse_posts(page)
 

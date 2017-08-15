@@ -9,8 +9,23 @@ import tensorflow as tf
 from sklearn.manifold import TSNE
 
 
-TXT_FILE_NAME = 'text8'
+TXT_FILE_NAME = 'data.txt'
 VOCAB_SIZE    = 10000
+SOURCE_PATH   = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE_NAME = 'skip_gram_train_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
+LOGS_FOLDER   = 'logs'
+
+# Right working directory
+os.chdir(SOURCE_PATH)
+
+# Set up logs
+if not os.path.exists(LOGS_FOLDER):
+    os.makedirs(LOGS_FOLDER)
+
+logging.basicConfig(format='%(levelname)s\t%(asctime)s\t%(message)s', filename='{}/{}'.format(LOGS_FOLDER,LOG_FILE_NAME), datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+logging.info('Application has started')
+
+
 
 with open(TXT_FILE_NAME) as txt_file:
     words = tf.compat.as_str(txt_file.read()).split()
@@ -153,6 +168,9 @@ with graph.as_default(), tf.device('/gpu:0'):
     valid_embeddings = tf.nn.embedding_lookup(normalized_embeddings, valid_dataset)
     similarity = tf.matmul(valid_embeddings, tf.transpose(normalized_embeddings))
 
+# Create a saver.
+saver = tf.train.Saver(embeddings,softmax_weights,softmax_biases)
+
 num_steps = 100001
 with tf.Session(
     graph=graph, 
@@ -180,6 +198,8 @@ with tf.Session(
             average_loss = 0
         # note that this is expensive (~20% slowdown if computed every 500 steps)
         if step % 10000 == 0:
+            # Save the progress
+            saver.save(session, 'saved_session.model', global_step=step)
             sim = similarity.eval()
             for i in range(valid_size):
                 valid_word = key_reverse_hash_map[valid_examples[i]]

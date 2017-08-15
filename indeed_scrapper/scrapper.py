@@ -21,7 +21,7 @@ TIMEOUT       = 1
 LOGS_FOLDER   = 'logs'
 EXPORT_CSV    = False
 EXPORT_JSON   = False
-COMPANY_NAME  = 'Dxc-Technology'
+COMPANY_NAME  = 'google'
 
 # Right working directory
 os.chdir(SOURCE_PATH)
@@ -37,11 +37,12 @@ logging.info('Application has started')
 # Configs
 configs = configparser.ConfigParser()
 configs.read('config.ini')
+COMPANY_NAME = configs['default']['COMPANY_NAME']
 REQ_ATTEMPTS = int(configs['default']['REQ_ATTEMPTS'])
 TIMEOUT      = int(configs['default']['TIMEOUT'])
 EXPORT_CSV   = configs['default'].getboolean('EXPORT_CSV' )
 EXPORT_JSON  = configs['default'].getboolean('EXPORT_JSON')
-logging.info('Reqeust Attempts:{}, Timeout (secs): {}, Export CSV?: {}, Export JSON?: {}'.format(REQ_ATTEMPTS, TIMEOUT, EXPORT_CSV, EXPORT_JSON))
+logging.info('Company:{}, Reqeust Attempts:{}, Timeout (secs): {}, Export CSV?: {}, Export JSON?: {}'.format(COMPANY_NAME, REQ_ATTEMPTS, TIMEOUT, EXPORT_CSV, EXPORT_JSON))
 
 def request_handler(url): 
     global REQ_ATTEMPTS; global TIMEOUT; global logging
@@ -82,6 +83,7 @@ total_num_reviews = int(re.sub("\D", "", soup.find(attrs={"class":"cmp-filter-re
 
 with open('reviews.json', 'w', encoding='utf-8') as json_file, open('reviews.csv', 'w') as csv_file:  
     json_file.write('[')
+    total_reviews_fact = 0
     for page_num in [x for x in range(total_num_reviews) if x % 20 == 0]:
         a_document = str(request_handler('https://www.indeed.com/cmp/{comp}/reviews?fcountry=ALL&start={page_num}'.format(comp=COMPANY_NAME,page_num=page_num)))
         #if not a_document: continue
@@ -132,6 +134,7 @@ with open('reviews.json', 'w', encoding='utf-8') as json_file, open('reviews.csv
             #print(a_review)
             #print("--------------------------------------------------------------")
         logging.info('# processed reviews from the page: {}'.format(len(reviews_list)))
+        total_reviews_fact += len(reviews_list)
     
         #json_data = json.dumps(reviews_list)
         
@@ -141,5 +144,6 @@ with open('reviews.json', 'w', encoding='utf-8') as json_file, open('reviews.csv
             json_file.write(',') 
             json.dump(a_review_dict, json_file, indent=4, ensure_ascii=False)
     
+    logging.info('# scraped reviews: {}, # reviews according to website: {}'.format(total_reviews_fact,total_num_reviews))
     json_file.write(']')
-
+    
