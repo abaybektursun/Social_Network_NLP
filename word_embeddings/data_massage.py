@@ -51,8 +51,8 @@ def remove_common_words(string):
 out_name = 'data.txt'
 with open(out_name, 'w') as out_file:
     for page_id in page_ids:
-        csv_name          = '../fb_scrapper/{}_page.csv'.format(page_id)
-        csv_comments_name = '../fb_scrapper/{}_page_comments.csv'.format(page_id)
+        csv_name          = '../fb_scrapper/data/{}_page.csv'.format(page_id)
+        csv_comments_name = '../fb_scrapper/data/{}_page_comments.csv'.format(page_id)
         with open(csv_name)          as csv_file, \
              open(csv_comments_name) as comments_csv_file:
             
