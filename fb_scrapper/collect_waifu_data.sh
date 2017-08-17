@@ -1,4 +1,4 @@
-PAGES=(1445665322420220 mamiandkyoko 7deadlysinsfmab)
+PAGES=(WeAreKWGB KDNAnime ReWaifuProject)
 
 for i in ${PAGES[*]}
 do

@@ -8,3 +8,5 @@ text8
 company-reviews/
 word_embeddings/model_waifu*/
 word_embeddings/data.txt
+*.out
+
