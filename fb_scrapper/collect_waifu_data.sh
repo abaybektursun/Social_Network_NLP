@@ -1,6 +1,6 @@
-PAGES=(AlexWavvesLovesYouLosers Circumcision.ThePage)
+PAGES=(1445665322420220 mamiandkyoko 7deadlysinsfmab)
 
 for i in ${PAGES[*]}
 do
-    python3 scrap.py $i &
+    nohup python3 scrap.py $i &
 done
