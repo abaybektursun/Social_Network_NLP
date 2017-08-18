@@ -1,4 +1,4 @@
-PAGES=(ReWaifuProject HTNOCMisheardLyrics WaifuWorks LewdShips 1610788579132690 waifuspaceprogram SenpaiWaifu69 KiyoshiSugoi AdrianoSempai.LoliWaifu loliwaifus ILoveYouOniiChan Squiddiesgunnagetya lewds.are.sin.1 lewdwaifus4u VeryLewdLife ThisIsNotALewdPage 1410987655779380 553359274700177 217055368736093 thatsprettyillegal)
+PAGES=(KawaiiSenpai cuteanimegirls13 RealitySuckedCuzFantasyIsBetter KusoTTK2.0 6969dokidoki6969 wouldloliagain VisonOfLolis LoliCentralTwoPointO loliconmasa LoliconsUniteUncensored2 LoliRaptors Unlimited.Loli.Works BestWaifuClub InfiniteStratos.Official KurumuKuronosDeliciousBoobs edgy.weeb.memes memehugs WDYMISTPALOAD 235791193222581 707108439433429 otherlewdness osugame CuddlesAndPatpats zenkichi91)
  
 #add 50 page run 2 pages same time
 pids=""
