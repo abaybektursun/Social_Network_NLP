@@ -1,4 +1,4 @@
-PAGES=(KawaiiSenpai cuteanimegirls13 RealitySuckedCuzFantasyIsBetter KusoTTK2.0 6969dokidoki6969 wouldloliagain VisonOfLolis LoliCentralTwoPointO loliconmasa LoliconsUniteUncensored2 LoliRaptors Unlimited.Loli.Works BestWaifuClub InfiniteStratos.Official KurumuKuronosDeliciousBoobs edgy.weeb.memes memehugs WDYMISTPALOAD 235791193222581 707108439433429 otherlewdness osugame CuddlesAndPatpats zenkichi91)
+PAGES=(HomuxMado GlassesHomura sayachan KyootChan eromanga.anime EromangaSenseiUSA eromanga.ala Fuck-mariwana-legalize-anime-waifu-marieg EcchiFederation LoliRepublic LoliconUnion teaisalolicon 1430134157272350 LoliHunters2 TBoLolicons EveryonesOneeChan UnlimitedMoe MWMMisery Anotherpagewithanimucontent RealLifeIsntEvenSugoi2 LyntesHappyPlace Bimouto MeganekkoBestGirl ltelk1 570265806464345 InTheMoodForALewd WaifuLove ponkotsuposting weeabooty 580878808676318)
  
 #add 50 page run 2 pages same time
 pids=""

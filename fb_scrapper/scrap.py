@@ -14,15 +14,19 @@ LOG_FILE_NAME = 'fb_scrapper_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H
 REQ_ATTEMPTS  = 0
 TIMEOUT       = 0
 LOGS_FOLDER   = 'logs'
+DATA_FOLDER   = 'data/'
 EXPORT_CSV    = False
 EXPORT_JSON   = False
 
 # Right working directory
 os.chdir(SOURCE_PATH)
 
-# Set up logs
+# Set up logs folder
 if not os.path.exists(LOGS_FOLDER):
     os.makedirs(LOGS_FOLDER)
+# Setup data folder
+if not os.path.exists(DATA_FOLDER):
+    os.makedirs(DATA_FOLDER)
 
 # Get FB access token
 fb_configs = configparser.ConfigParser()
@@ -158,7 +162,7 @@ def traverse_posts(page_id, get_reactions=False):
     fields='from,message,link,tags,object_attachment,created_time,description'
     url = '{root}/{page}/{req}/?fields={fields}&access_token={token}'.format(root=GRAPH_API,page=page,req=req_type,fields=fields,token=token) 
     num_posts = 0
-    with open('data/'+page+'_page.json', 'w') as json_file, open('data/'+page+'_page.csv', 'w') as csv_file, open('data/'+page+'_page_comments.csv', 'w') as csv_comments_file:    
+    with open(DATA_FOLDER+page+'_page.json', 'w') as json_file, open(DATA_FOLDER+page+'_page.csv', 'w') as csv_file, open(DATA_FOLDER+page+'_page_comments.csv', 'w') as csv_comments_file:    
         csv_writer = csv.writer(csv_file)
         csv_comments_writer = csv.writer(csv_comments_file)
         
