@@ -19,6 +19,7 @@ VOCAB_SIZE    = 5000
 SOURCE_PATH   = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE_NAME = 'skip_gram_train_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
 LOGS_FOLDER   = 'logs'
+LEARNING_RATE = 1.0
 
 # Right working directory
 os.chdir(SOURCE_PATH)
@@ -65,7 +66,7 @@ key_reverse_hash_map = dict(zip(hash_map.values(), hash_map.keys()))
 
 
 data_index = 0
-def generate_batch(batch_size, num_skips, skip_window):
+def next_batch(batch_size, num_skips, skip_window):
     #---------------------------------- 
     global data_index
     assert batch_size % num_skips == 0
@@ -163,14 +164,14 @@ with graph.as_default(), tf.device('/gpu:0'):
     )
 
     # Optimizer.
-    optimizer = tf.train.AdagradOptimizer(1.0).minimize(loss)
+    optimizer = tf.train.AdagradOptimizer(LEARNING_RATE).minimize(loss)
     
     # Compute the similarity between minibatch examples and all embeddings.
     # We use the cosine distance:
     norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
     normalized_embeddings = embeddings / norm
-    valid_embeddings = tf.nn.embedding_lookup(normalized_embeddings, valid_dataset)
-    similarity = tf.matmul(valid_embeddings, tf.transpose(normalized_embeddings))
+    validation_embeddings = tf.nn.embedding_lookup(normalized_embeddings, valid_dataset)
+    similarity = tf.matmul(validation_embeddings, tf.transpose(normalized_embeddings))
 
 # Create a saver.
 saver = tf.train.Saver([embeddings,softmax_weights,softmax_biases])
@@ -187,9 +188,9 @@ with tf.Session(
     print('Initialized')
     average_loss = 0
     for step in range(num_steps):
-        batch_data, batch_labels = generate_batch(batch_size, num_skips, skip_window)
+        batch_x, batch_labels = next_batch(batch_size, num_skips, skip_window)
         feed_dict = {
-            train_dataset : batch_data, 
+            train_dataset : batch_x, 
             train_labels : batch_labels
         }
         _, l = session.run([optimizer, loss], feed_dict=feed_dict)
