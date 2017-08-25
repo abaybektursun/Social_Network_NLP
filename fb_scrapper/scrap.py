@@ -13,10 +13,17 @@ SOURCE_PATH   = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE_NAME = 'fb_scrapper_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
 REQ_ATTEMPTS  = 0
 TIMEOUT       = 0
-LOGS_FOLDER   = 'logs'
+LOGS_FOLDER   = 'logs/'
 DATA_FOLDER   = 'data/'
 EXPORT_CSV    = False
 EXPORT_JSON   = False
+
+if len(sys.argv) >= 2:
+    page = sys.argv[1]
+# Second arguemnt is the topic (class)
+if len(sys.argv) = 3
+    DATA_FOLDER += str(sys.argv[2]) + '/'
+    LOGS_FOLDER += str(sys.argv[2]) + '/'
 
 # Right working directory
 os.chdir(SOURCE_PATH)
@@ -42,8 +49,7 @@ TIMEOUT      = int(configs['default']['TIMEOUT'])
 EXPORT_CSV   = configs['default'].getboolean('EXPORT_CSV' )
 EXPORT_JSON  = configs['default'].getboolean('EXPORT_JSON')
 
-if len(sys.argv) == 2:
-    page = sys.argv[1]
+
 
 logging.basicConfig(format='%(levelname)s\t%(asctime)s\t%(message)s', filename='{}/{}_{}'.format(LOGS_FOLDER,page,LOG_FILE_NAME), datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 logging.info('Application has started')

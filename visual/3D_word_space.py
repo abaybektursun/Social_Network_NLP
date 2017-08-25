@@ -10,6 +10,7 @@ import numpy  as np
 import os
 import re
 import time
+import pickle
 import random
 import logging
 
@@ -42,43 +43,41 @@ layout = dict(
 #py.plot(fig, filename='3d point clustering')
 
 #----------------------------------------------------
-VOCAB_SIZE    = 5000
-TXT_FILE_NAME = '../word_embeddings/data.txt'
-with open(TXT_FILE_NAME) as txt_file:
-    words = tf.compat.as_str(txt_file.read()).split()
-
-
-pre_vocab = [['NULL', -1]] + Counter(words).most_common(VOCAB_SIZE - 1)
-
-# Debug
-#print(pre_vocab[:20])
-
-# Because hash is faster when searching word's index
-hash_map = dict()
-for idx, (a_word, occurrence) in enumerate(pre_vocab):
-    hash_map[a_word] = idx
-
-data = []
-nulls = 0
-
-# Words with occurence rank higher than VOCAB_SIZE (rare words) will be replaces with Null
-for a_word in words:
-    if a_word in hash_map:
-        a_word_idx = hash_map[a_word]
-    else:
-        a_word_idx = 0
-        nulls += 1
-    data.append(a_word_idx)
-
-pre_vocab[0][1] = nulls
-
-# Turn values into keys, and keys into values
-key_reverse_hash_map = dict(zip(hash_map.values(), hash_map.keys()))
-print(type(key_reverse_hash_map))
-print(len(key_reverse_hash_map))
-print('---------------------------------------------')
-with open('key_reverse_hash_map','wb') as numpyFile:
-    np.save(numpyFile, key_reverse_hash_map)
+#VOCAB_SIZE    = 5000
+#TXT_FILE_NAME = '../word_embeddings/data.txt'
+#with open(TXT_FILE_NAME) as txt_file:
+#    words = tf.compat.as_str(txt_file.read()).split()
+#
+#
+#pre_vocab = [['NULL', -1]] + Counter(words).most_common(VOCAB_SIZE - 1)
+#
+## Debug
+##print(pre_vocab[:20])
+#
+## Because hash is faster when searching word's index
+#hash_map = dict()
+#for idx, (a_word, occurrence) in enumerate(pre_vocab):
+#    hash_map[a_word] = idx
+#
+#data = []
+#nulls = 0
+#
+## Words with occurence rank higher than VOCAB_SIZE (rare words) will be replaces with Null
+#for a_word in words:
+#    if a_word in hash_map:
+#        a_word_idx = hash_map[a_word]
+#    else:
+#        a_word_idx = 0
+#        nulls += 1
+#    data.append(a_word_idx)
+#
+#pre_vocab[0][1] = nulls
+#
+## Turn values into keys, and keys into values
+#key_reverse_hash_map = dict(zip(hash_map.values(), hash_map.keys()))
+#
+#with open('../word_embeddings/key_reverse_hash_map.pkl','wb') as pickleFile:
+#    pickle.dump(key_reverse_hash_map, pickleFile)
 #----------------------------------------------------
 
 # Add ops to save and restore all the variables.
@@ -86,10 +85,8 @@ num_points = 400
 VOCAB_SIZE = 5000
 embedding_size = 128 
 
-#with open('../word_embeddings/key_reverse_hash_map','rb') as numpyFile:
-#    key_reverse_hash_map = np.load(numpyFile)
-#print(type(key_reverse_hash_map))
-#print(len(key_reverse_hash_map))
+with open('../word_embeddings/key_reverse_hash_map.pkl','rb') as pickleFile:
+    key_reverse_hash_map = pickle.load(pickleFile)
 
 
 tf.reset_default_graph()

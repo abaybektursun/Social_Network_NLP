@@ -6,6 +6,7 @@ from tempfile    import TemporaryFile
 import os
 import re
 import time
+import pickle
 import random
 import logging
 import collections
@@ -72,8 +73,9 @@ pre_vocab[0][1] = nulls
 
 # Turn values into keys, and keys into values
 key_reverse_hash_map = dict(zip(hash_map.values(), hash_map.keys())) 
-with open('key_reverse_hash_map','wb') as numpyFile:
-    np.save(numpyFile, key_reverse_hash_map)
+
+th open(SESSION_FOLDER+'key_reverse_hash_map.pkl','wb') as pickleFile:
+    pickle.dump(key_reverse_hash_map, pickleFile)
 
 
 data_index = 0

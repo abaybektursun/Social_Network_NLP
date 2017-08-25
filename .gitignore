@@ -10,4 +10,6 @@ company-reviews/
 word_embeddings/model*/
 word_embeddings/data.txt
 *.out
+*.pkl
+
 
