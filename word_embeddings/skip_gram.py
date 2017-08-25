@@ -1,6 +1,7 @@
 from datetime    import datetime, date, time
 from collections import Counter
 from matplotlib  import pylab
+from tempfile    import TemporaryFile
 
 import os
 import re
@@ -14,15 +15,23 @@ import tensorflow as tf
 from sklearn.manifold import TSNE
 
 
-TXT_FILE_NAME = 'data.txt'
-VOCAB_SIZE    = 5000
-SOURCE_PATH   = os.path.dirname(os.path.abspath(__file__))
-LOG_FILE_NAME = 'skip_gram_train_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
-LOGS_FOLDER   = 'logs'
-LEARNING_RATE = 1.0
+TXT_FILE_NAME  = 'data.txt'
+VOCAB_SIZE     = 5000
+SOURCE_PATH    = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE_NAME  = 'skip_gram_train_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
+LOGS_FOLDER    = 'logs'
+LEARNING_RATE  = 1.0
+SESSION_FOLDER = 'model_{}/'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
 
 # Right working directory
 os.chdir(SOURCE_PATH)
+
+# Set up logs
+if not os.path.exists(SESSION_FOLDER):
+    os.makedirs(SESSION_FOLDER)
+else:
+    print('Session already exists my dude')
+    exit(1)
 
 # Set up logs
 if not os.path.exists(LOGS_FOLDER):
@@ -63,6 +72,8 @@ pre_vocab[0][1] = nulls
 
 # Turn values into keys, and keys into values
 key_reverse_hash_map = dict(zip(hash_map.values(), hash_map.keys())) 
+with open('key_reverse_hash_map','wb') as numpyFile:
+    np.save(numpyFile, key_reverse_hash_map)
 
 
 data_index = 0
@@ -106,7 +117,7 @@ def next_batch(batch_size, num_skips, skip_window):
 #--------------------------------------------------------------------------------
 batch_size = 128
 embedding_size = 128 # Dimension of the embedding vector.
-skip_window = 3 # How many words to consider left and right.
+skip_window = 4 # How many words to consider left and right.
 num_skips = 2 # How many times to reuse an input to generate a label.
 # We pick a random validation set to sample nearest neighbors. here we limit the
 # validation samples to the words that have a low numeric ID, which by
@@ -129,8 +140,8 @@ with graph.as_default(), tf.device('/gpu:0'):
     valid_dataset = tf.constant(valid_examples, dtype=tf.int32)
 
     # Variables
-    embeddings = tf.Variable(
-        tf.random_uniform(  [VOCAB_SIZE, embedding_size], -1.0, 1.0  )
+    embeddings = tf.get_variable("embeddings",
+        initializer=tf.random_uniform(  [VOCAB_SIZE, embedding_size], -1.0, 1.0  )
     ) # V x N
     softmax_weights = tf.Variable(
         tf.truncated_normal([VOCAB_SIZE, embedding_size], stddev=1.0 / np.sqrt(embedding_size))
@@ -176,7 +187,7 @@ with graph.as_default(), tf.device('/gpu:0'):
 # Create a saver.
 saver = tf.train.Saver([embeddings,softmax_weights,softmax_biases])
 
-num_steps = 1000001
+num_steps = 100001
 with tf.Session(
     graph=graph, 
     config=tf.ConfigProto(
@@ -204,7 +215,7 @@ with tf.Session(
         # note that this is expensive (~20% slowdown if computed every 500 steps)
         if step % 10000 == 0:
             # Save the progress
-            saver.save(session, 'saved_session.model', global_step=step)
+            saver.save(session, SESSION_FOLDER, global_step=step)
             sim = similarity.eval()
             for i in range(valid_size):
                 valid_word = key_reverse_hash_map[valid_examples[i]]
@@ -216,24 +227,3 @@ with tf.Session(
                     log = '%s %s,' % (log, close_word)
                 print(log)
     final_embeddings = normalized_embeddings.eval()
-
-
-num_points = 400
-
-tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-two_d_embeddings = tsne.fit_transform(final_embeddings[1:num_points+1, :])
-
-def plot(embeddings, labels):
-    assert embeddings.shape[0] >= len(labels), 'More labels than embeddings'
-    pylab.figure(figsize=(15,15))  # in inches
-    for i, label in enumerate(labels):
-        x, y = embeddings[i,:]
-        pylab.scatter(x, y)
-        pylab.annotate(label, xy=(x, y), xytext=(5, 2), textcoords='offset points',
-                     ha='right', va='bottom')
-    pylab.show()
-
-words = [key_reverse_hash_map[i] for i in range(1, num_points+1)]
-plot(two_d_embeddings, words)
-
-print("END!!")

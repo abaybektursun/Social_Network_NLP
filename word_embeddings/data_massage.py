@@ -11,7 +11,7 @@ with open('popular-both-first.txt') as openfile:
 with open('popular-last.txt') as openfile:
     common_words += openfile.read().split("\n")
 
-common_words += ['which','when','can','time','into','some','them','other','than','then','also','back','two','how','first','way','even','because','any','these','day','most','all','just','not','as','up','there','the','a','an','and','or','if','that','so','this','year','one','our','his','her','my','their','your','its','to','of','in','for','on','with','at','by','from','out','over','after','but','about','I','it','he','you','they','we','she','me','him','us','what','who','be','have','would','get','could','see','look','come','give','say','do','will','go','make','know','take','use','work']
+#common_words += ['which','when','can','time','into','some','them','other','than','then','also','back','two','how','first','way','even','because','any','these','day','most','all','just','not','as','up','there','the','a','an','and','or','if','that','so','this','year','one','our','his','her','my','their','your','its','to','of','in','for','on','with','at','by','from','out','over','after','but','about','I','it','he','you','they','we','she','me','him','us','what','who','be','have','would','get','could','see','look','come','give','say','do','will','go','make','know','take','use','work']
 
 
 common_words = [x.lower() for x in common_words]
