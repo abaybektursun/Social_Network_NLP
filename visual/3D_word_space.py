@@ -14,33 +14,7 @@ import pickle
 import random
 import logging
 
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/alpha_shape.csv')
-df.head()
 
-scatter = dict(
-    mode = "markers",
-    name = "y",
-    type = "scatter3d",    
-    x = df['x'], y = df['y'], z = df['z'],
-    marker = dict( size=3, color="rgb(23, 190, 207)" )
-)
-clusters = dict(
-    alphahull = 7,
-    name = "y",
-    opacity = 0.1,
-    type = "mesh3d",    
-    x = df['x'], y = df['y'], z = df['z']
-)
-layout = dict(
-    title = '3d point clustering',
-    scene = dict(
-        xaxis = dict( zeroline=False ),
-        yaxis = dict( zeroline=False ),
-        zaxis = dict( zeroline=False ),
-    )
-)
-#fig = dict( data=[scatter, clusters], layout=layout )
-#py.plot(fig, filename='3d point clustering')
 
 #----------------------------------------------------
 #VOCAB_SIZE    = 5000
@@ -103,10 +77,10 @@ with tf.Session() as sess:
     saver.restore(sess, "../word_embeddings/model_nazi2/saved_session.model-90000") 
     final_embeddings = normalized_embeddings.eval()
 
-tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-two_d_embeddings = tsne.fit_transform(final_embeddings[1:num_points+1, :])
+tsne = TSNE(perplexity=30, n_components=3, init='pca', n_iter=5000)
+n_d_embeddings = tsne.fit_transform(final_embeddings[1:num_points+1, :])
 
-
+# Debug
 def plot(embeddings, labels):
     assert embeddings.shape[0] >= len(labels), 'More labels than embeddings'
     pylab.figure(figsize=(15,15))  # in inches
@@ -118,4 +92,45 @@ def plot(embeddings, labels):
     pylab.show()
 
 words = [key_reverse_hash_map[i] for i in range(1, num_points+1)]
-plot(two_d_embeddings, words) 
+
+#plot(two_d_embeddings, words) 
+
+# Visualization #################################################################################
+
+#df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/alpha_shape.csv')
+#df.head()
+
+#print(df)
+
+x = [i[0] for i in n_d_embeddings]
+y = [i[1] for i in n_d_embeddings]
+z = [i[2] for i in n_d_embeddings]
+
+
+scatter = dict(
+    mode = "markers+text",
+    name = "y",
+    type = "scatter3d",    
+    x = x, y = y, z = z,
+    marker = dict( size=5, color="rgb(23, 190, 207)" ),
+    text = words,
+    opacity = 0.4
+)
+"""clusters = dict(
+    alphahull = 20,
+    name = "y",
+    opacity = 0.05,
+    type = "mesh3d",    
+    x = x, y = y, z = z
+)"""
+layout = dict(
+    title = '3d point clustering',
+    scene = dict(
+        xaxis = dict( zeroline=False ),
+        yaxis = dict( zeroline=False ),
+        zaxis = dict( zeroline=False ),
+    )
+)
+
+fig = dict( data=[scatter], layout=layout )
+py.plot(fig, filename='3d point clustering')
