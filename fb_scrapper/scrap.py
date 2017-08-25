@@ -21,7 +21,7 @@ EXPORT_JSON   = False
 if len(sys.argv) >= 2:
     page = sys.argv[1]
 # Second arguemnt is the topic (class)
-if len(sys.argv) == 3
+if len(sys.argv) == 3:
     DATA_FOLDER += str(sys.argv[2]) + '/'
     LOGS_FOLDER += str(sys.argv[2]) + '/'
 
