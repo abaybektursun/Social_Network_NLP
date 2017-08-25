@@ -1,6 +1,6 @@
 PAGES=()
+TOPIC=""
 
-#add 50 page run 2 pages same time
 pids=""
 for ((i = 0; i < ${#PAGES[@]}; i++))
 do
