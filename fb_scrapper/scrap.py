@@ -18,6 +18,15 @@ DATA_FOLDER   = 'data/'
 EXPORT_CSV    = False
 EXPORT_JSON   = False
 
+# Configs
+configs = configparser.ConfigParser()
+configs.read('config.ini')
+page = configs['default']['page_id']
+REQ_ATTEMPTS = int(configs['default']['REQ_ATTEMPTS'])
+TIMEOUT      = int(configs['default']['TIMEOUT'])
+EXPORT_CSV   = configs['default'].getboolean('EXPORT_CSV' )
+EXPORT_JSON  = configs['default'].getboolean('EXPORT_JSON')
+
 if len(sys.argv) >= 2:
     page = sys.argv[1]
 # Second arguemnt is the topic (class)
@@ -39,15 +48,6 @@ if not os.path.exists(DATA_FOLDER):
 fb_configs = configparser.ConfigParser()
 fb_configs.read('key.fbtoken')
 token = '{}|{}'.format(fb_configs['app']['id'], fb_configs['app']['secret'])
-
-# Configs
-configs = configparser.ConfigParser()
-configs.read('config.ini')
-page = configs['default']['page_id']
-REQ_ATTEMPTS = int(configs['default']['REQ_ATTEMPTS'])
-TIMEOUT      = int(configs['default']['TIMEOUT'])
-EXPORT_CSV   = configs['default'].getboolean('EXPORT_CSV' )
-EXPORT_JSON  = configs['default'].getboolean('EXPORT_JSON')
 
 
 
