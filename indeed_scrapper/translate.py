@@ -26,23 +26,42 @@ def request_handler(url):
     return None
 
 def translate(text):
-    language = detect(text) 
-    if language == 'en': 
+    language = ''
+    try: language = detect(text)
+    except: return text
+    print("language: "+language)
+    if language == 'en' or 'en' in detect_langs(text): 
         return text
     print("@@translated!@@")
     req = "https://translate.yandex.net/api/v1.5/tr.json/translate?" + \
           "key={API_key}"     + \
           "&text=\"{text}\""  + \
           "&lang={direction}"
-    req = req.format(API_key=sys.argv[1], text=text, direction=language+'-en')
-    translated = request_handler(req)
+    try: req = req.format(API_key=sys.argv[1], text=text, direction=language+'-en')
+    except: print("You need to provide Yandex API key as a first parameter")
+    translated = ''
+    req_data = request_handler(req)
+    if req_data: translated_json = json.loads(req_data)
+    else: return ''
+    try: translated = translated_json["text"][0].replace("'", "").replace('"', '')
+    except: pass
     return str(translated or '')
 
+translated = []
 with open(FILE_NAME) as indeed_file:
     json_data = json.load(indeed_file)
-    translated = []
     for a_review in json_data:
+        a_review_save = a_review.copy()
         if a_review['pros']: 
-            print(translate(a_review['pros']))
-        #if a_review['cons']:
-        #if a_review['review_text']:
+            a_review_save['pros'] = translate(a_review['pros'])
+            print('-----PROS:\n'+a_review_save['pros'])
+        if a_review['cons']:
+            a_review_save['cons'] = translate(a_review['cons'])
+            print('-----CONS:\m' + a_review_save['cons'])
+        if a_review['review_text']:
+            a_review_save['review_text'] = translate(a_review['review_text'])
+            print('-----REV:\n'+a_review_save['review_text'])
+        translated.append(a_review_save)
+
+with open('TRANSLATED_' + FILE_NAME, 'w') as indeed_file:
+    json.dump(translated, indeed_file)
