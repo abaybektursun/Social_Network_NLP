@@ -97,7 +97,7 @@ except Exception as e:
     total_num_reviews = int(re.sub("\D", "", manual_string(soup) ) )
 #.......................................................................................................................................................
 
-with open(COMPANY_NAME+'reviews.json', 'w', encoding='utf-8') as json_file, open(COMPANY_NAME+'_reviews.csv', 'w') as csv_file:  
+with open(COMPANY_NAME+'_reviews.json', 'w', encoding='utf-8') as json_file, open(COMPANY_NAME+'_reviews.csv', 'w') as csv_file:  
     json_file.write('[')
     total_reviews_fact = 0
     for page_num in [x for x in range(total_num_reviews) if x % 20 == 0]:
