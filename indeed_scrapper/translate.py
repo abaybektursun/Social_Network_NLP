@@ -1,4 +1,4 @@
-from langdetect import detect 
+from langdetect import detect, detect_langs 
 
 import urllib.request
 import requests
@@ -8,8 +8,8 @@ import sys
 import os
 
 FILE_NAME     = 'Hewlett-Packard-Enterprise_reviews.json'
-REQ_ATTEMPTS  = 5
-TIMEOUT       = 2
+REQ_ATTEMPTS  = 2
+TIMEOUT       = 1
 
 def request_handler(url):
     global REQ_ATTEMPTS; global TIMEOUT;
@@ -37,7 +37,7 @@ def translate(text):
           "key={API_key}"     + \
           "&text=\"{text}\""  + \
           "&lang={direction}"
-    try: req = req.format(API_key=sys.argv[1], text=text, direction=language+'-en')
+    try: req = req.format(API_key=sys.argv[1], text=text.encode('raw_unicode_escape').decode('utf8'), direction=language+'-en')
     except: print("You need to provide Yandex API key as a first parameter")
     translated = ''
     req_data = request_handler(req)
@@ -52,13 +52,13 @@ with open(FILE_NAME) as indeed_file:
     json_data = json.load(indeed_file)
     for a_review in json_data:
         a_review_save = a_review.copy()
-        if a_review['pros']: 
+        if a_review['pros'] and str(a_review['pros']).upper() != 'NONE': 
             a_review_save['pros'] = translate(a_review['pros'])
             print('-----PROS:\n'+a_review_save['pros'])
-        if a_review['cons']:
+        if a_review['cons'] and str(a_review['cons']).upper() != 'NONE':
             a_review_save['cons'] = translate(a_review['cons'])
             print('-----CONS:\m' + a_review_save['cons'])
-        if a_review['review_text']:
+        if a_review['review_text'] and str(a_review['review_text']).upper() != 'NONE':
             a_review_save['review_text'] = translate(a_review['review_text'])
             print('-----REV:\n'+a_review_save['review_text'])
         translated.append(a_review_save)
