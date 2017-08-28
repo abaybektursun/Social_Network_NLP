@@ -74,7 +74,7 @@ pre_vocab[0][1] = nulls
 # Turn values into keys, and keys into values
 key_reverse_hash_map = dict(zip(hash_map.values(), hash_map.keys())) 
 
-th open(SESSION_FOLDER+'key_reverse_hash_map.pkl','wb') as pickleFile:
+with open(SESSION_FOLDER+'key_reverse_hash_map.pkl','wb') as pickleFile:
     pickle.dump(key_reverse_hash_map, pickleFile)
 
 
@@ -217,7 +217,7 @@ with tf.Session(
         # note that this is expensive (~20% slowdown if computed every 500 steps)
         if step % 10000 == 0:
             # Save the progress
-            saver.save(session, SESSION_FOLDER, global_step=step)
+            saver.save(session, SESSION_FOLDER+'/'+TOPIC, global_step=step)
             sim = similarity.eval()
             for i in range(valid_size):
                 valid_word = key_reverse_hash_map[valid_examples[i]]

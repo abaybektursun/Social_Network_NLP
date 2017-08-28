@@ -9,6 +9,7 @@ import numpy  as np
 
 import os
 import re
+import sys
 import time
 import pickle
 import random
@@ -55,9 +56,12 @@ import logging
 #----------------------------------------------------
 
 # Add ops to save and restore all the variables.
-num_points = 400
+NUM_POINTS = 100
 VOCAB_SIZE = 5000
 embedding_size = 128 
+MODEL_FOLDER_NAME = sys.argv[1]
+TOPIC = sys.argv[2]
+
 
 with open('../word_embeddings/key_reverse_hash_map.pkl','rb') as pickleFile:
     key_reverse_hash_map = pickle.load(pickleFile)
@@ -74,11 +78,11 @@ saver = tf.train.Saver()
 # Use the saver object normally after that.
 with tf.Session() as sess:
     embeddings.initializer.run()
-    saver.restore(sess, "../word_embeddings/model_nazi2/saved_session.model-90000") 
+    saver.restore(sess, "../word_embeddings/{}/{}-90000".format(MODEL_FOLDER_NAME, TOPIC) ) 
     final_embeddings = normalized_embeddings.eval()
 
 tsne = TSNE(perplexity=30, n_components=3, init='pca', n_iter=5000)
-n_d_embeddings = tsne.fit_transform(final_embeddings[1:num_points+1, :])
+n_d_embeddings = tsne.fit_transform(final_embeddings[1:NUM_POINTS+1, :])
 
 # Debug
 def plot(embeddings, labels):
@@ -91,16 +95,11 @@ def plot(embeddings, labels):
                      ha='right', va='bottom')
     pylab.show()
 
-words = [key_reverse_hash_map[i] for i in range(1, num_points+1)]
+words = [key_reverse_hash_map[i] for i in range(1, NUM_POINTS+1)]
 
 #plot(two_d_embeddings, words) 
 
 # Visualization #################################################################################
-
-#df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/alpha_shape.csv')
-#df.head()
-
-#print(df)
 
 x = [i[0] for i in n_d_embeddings]
 y = [i[1] for i in n_d_embeddings]
