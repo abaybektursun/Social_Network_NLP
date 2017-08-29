@@ -103,5 +103,3 @@ function flatten(root) {
   recurse(root);
   return nodes;
 }
-
-</script>
