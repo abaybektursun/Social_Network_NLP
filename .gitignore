@@ -11,5 +11,6 @@ word_embeddings/model*/
 word_embeddings/data.txt
 *.out
 *.pkl
-
+visual/company_reviews/company_reviewsenv/
+visual/company_reviews/__pycache__/
 

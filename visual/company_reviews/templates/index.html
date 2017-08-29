@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html class="no-js">
 <head>
-
-
+    
     <!-- Meta info -->
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pyaari Free Website HTML Template - By 198seven</title>
+    <title>Company Reviews</title>
     <meta content="" name="description">
     <meta name="author" content="">
     <meta name="format-detection" content="">
 
     <!-- Styles -->
+    
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
-    <link href="styles/main.css" rel="stylesheet" media="screen, print" type="text/css">
-    <script src="lib/modernizr-2.6.2.js"></script>
+    
+    <link href="{{ url_for('static', filename='main.css') }}" rel="stylesheet" media="screen, print" type="text/css">
+    <script src="{{ url_for('static', filename='modernizr-2.6.2.js') }}"></script>
 </head>
 <body>
     <div id="container" style="left: 0px;">
@@ -22,8 +23,10 @@
             
 <header>
     <div id="pfd">
-        <a href="index.html">
-            <img src="images/pyaari-logo.png" alt="Pyaari Website - For Website and Graphic Designers">
+        <!--a href="{{ url_for('templates', filename='index.html') }}"-->
+            
+            
+            <img src="{{ url_for('static', filename='images/pyaari-logo.png') }}" >
         </a>
     </div>
     <div id="preamble" class="home">
@@ -31,7 +34,7 @@
 	<h1>
 		Today’s monthly freebie, Pyaari responsive HTML5 template built on twitter bootstrap grid system. It’s a wonderful template fits the needs of companies that operate in the field of creativity and innovation also can be user for a one page products showcase.</h1>
 	<p class="em" style="display: none;">
-		If you are interested in contributing to this site and have something you would like to share by writing an article or offering freebies, please don’t hesitate to <a href="mailto:contact@198seven.com">write me an email</a></p>
+		If you are interested in contributing to this site and have something you would like to share by writing an article or offering freebies, please don’t hesitate to <a href="mailto:a@d.com">write me an email</a></p>
 	<a class="read-more" href="#">Read more +</a></div>
 <p>&nbsp;
 	</p>
@@ -40,17 +43,51 @@
 </header>
 <div id="our-work">
     <ul>
-<li><a href="project-detail-page.html"><img src="images/work/project-1.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a></li>
-<li><a href="project-detail-page.html"><img src="images/work/project-2.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a></li>
-<li><a href="project-detail-page.html"><img src="images/work/project-3.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li>
-<li><a href="project-detail-page.html"><img src="images/work/project-4.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Illustration</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a></li>
-<li><a href="project-detail-page.html"><img src="images/work/project-5.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a></li>
-<li><a href="project-detail-page.html"><img src="images/work/project-7.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li><br>
-<li><a href="project-detail-page.html"><img src="images/work/project-8.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Illustration</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a></li>
-<li><a href="project-detail-page.html"><img src="images/work/project-9.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a></li>
-<li><a href="project-detail-page.html"><img src="images/work/project-10.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li>
-<li><a href="project-detail-page.html"><img src="images/work/project-11.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a></li>
-<li><a href="project-detail-page.html"><img src="images/work/project-6.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li>
+        <!-- {{ url_for('', filename='') }} -->
+        {{ url_for('images', filename='work/project-1.jpg') }}
+<li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>198seven</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a>
+</li>
+<li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a>
+</li>
+<!--li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a>
+</li>
+<li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>Illustration</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a>
+</li>
+<li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a>
+</li>
+<li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li><br>
+<li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>Illustration</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a>
+</li>
+<li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a>
+</li>
+<li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a>
+</li>
+<li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a>
+</li>
+<li><a href="{{ url_for('templates', filename='project-detail-page.html') }}">
+    <img src="{{ url_for('images', filename='work/project-1.jpg') }}"><div class="overlay">    
+    <summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a>
+</li-->
 
 </ul>
 </div>
