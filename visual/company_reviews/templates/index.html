@@ -14,7 +14,10 @@
     <!-- Styles -->
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
     <link href="styles/main.css" rel="stylesheet" media="screen, print" type="text/css">
+    <link href="styles/data_vis.css" rel="stylesheet" type="text/css">
     <script src="lib/modernizr-2.6.2.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    
 </head>
 <body>
     <div id="container" style="left: 0px;">
@@ -94,7 +97,7 @@
     <div id="no-script">
         <div>
             <p>
-                The Pyaari website is fully responsive and requires Javascript.<br>
+                This website is fully responsive and requires Javascript.<br>
                 Please <a href="http://enable-javascript.com/">enable javascript</a> to use this site without issue.</p>
         </div>
     </div><!-- no-script -->
@@ -103,6 +106,7 @@
     <script src="ajax/jquery-1.11.0.min.js"></script>
     <script src="scripts/pyaari-main.1.0.js"></script>
     <script src="scripts/pyaari-menu.1.0.js"></script>
+    <script src="scripts/data_vis.js"></script>
     <script>
         $(document).ready(function () {
             PfdMenu._ctor();
