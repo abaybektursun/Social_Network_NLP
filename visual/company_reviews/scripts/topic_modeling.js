@@ -1,4 +1,4 @@
-var margin = {top: 20, right: 120, bottom: 20, left: 120},
+var margin = {top: 20, right: 120, bottom: 20, left: 150},
     width = 960 - margin.right - margin.left,
     height = 800 - margin.top - margin.bottom;
 
@@ -12,30 +12,32 @@ var tree = d3.layout.tree()
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
-var svg = d3.select("#test_graph").append("svg")
+// Change HTML properties
+var svg = d3.select("#list_1").append("svg")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("graph.json", function(error, flare) {
-  if (error) throw error;
-
-  root = flare;
-  root.x0 = height / 2;
-  root.y0 = 0;
-
-  function collapse(d) {
-    if (d.children) {
-      d._children = d.children;
-      d._children.forEach(collapse);
-      d.children = null;
+d3.json("graph.json", 
+    function(error, flare) {
+        if (error) throw error;
+        root = flare;
+        root.x0 = height / 2;
+        root.y0 = 0;
+      
+        function collapse(d) {
+          if (d.children) {
+            d._children = d.children;
+            d._children.forEach(collapse);
+            d.children = null;
+          }
+        }
+      
+        root.children.forEach(collapse);
+        update(root);
     }
-  }
-
-  root.children.forEach(collapse);
-  update(root);
-});
+);
 
 d3.select(self.frameElement).style("height", "800px");
 
