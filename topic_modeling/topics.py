@@ -65,4 +65,4 @@ with open(FILE_PATH) as content_file, open("graph.jon","w") as json_out:
     json.dump({
         "name":"Hewlett Packard Enterprise", 
         "children": [{"name":"Cons","children":con_cluster}, {"name":"Pros","children":pro_cluster}, {"name":"General Review","children":rev_cluster}]
-    }, json_out)
+    }, json_out, indent=4)

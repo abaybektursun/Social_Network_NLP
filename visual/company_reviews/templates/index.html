@@ -17,151 +17,48 @@
     <link href="styles/data_vis.css" rel="stylesheet" type="text/css">
     <script src="lib/modernizr-2.6.2.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
-    <!--script src="scripts/data_vis.js"></script-->
 
 </head>
 <body>
-        <script>
-    var width = 960,
-    height = 500,
-    root;
 
-    var force = d3.layout.force()
-        .linkDistance(80)
-        .charge(-120)
-        .gravity(.05)
-        .size([width, height])
-        .on("tick", tick);
-
-    var svg = d3.select("body").append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
-    var link = svg.selectAll(".link"),
-        node = svg.selectAll(".node");
-
-    d3.json("graph.json", function(error, json) {
-      if (error) throw error;
-
-      root = json;
-      update();
-    });
-
-    function update() {
-      var nodes = flatten(root),
-          links = d3.layout.tree().links(nodes);
-
-      // Restart the force layout.
-      force
-          .nodes(nodes)
-          .links(links)
-          .start();
-
-      // Update links.
-      link = link.data(links, function(d) { return d.target.id; });
-
-      link.exit().remove();
-
-      link.enter().insert("line", ".node")
-          .attr("class", "link");
-
-      // Update nodes.
-      node = node.data(nodes, function(d) { return d.id; });
-
-      node.exit().remove();
-
-      var nodeEnter = node.enter().append("g")
-          .attr("class", "node")
-          .on("click", click)
-          .call(force.drag);
-
-      nodeEnter.append("circle")
-          .attr("r", function(d) { return Math.sqrt(d.size) / 10 || 4.5; });
-
-      nodeEnter.append("text")
-          .attr("dy", ".35em")
-          .text(function(d) { return d.name; });
-
-      node.select("circle")
-          .style("fill", color);
-    }
-
-    function tick() {
-      link.attr("x1", function(d) { return d.source.x; })
-          .attr("y1", function(d) { return d.source.y; })
-          .attr("x2", function(d) { return d.target.x; })
-          .attr("y2", function(d) { return d.target.y; });
-
-      node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-    }
-
-    function color(d) {
-      return d._children ? "#3182bd" // collapsed package
-          : d.children ? "#c6dbef" // expanded package
-          : "#fd8d3c"; // leaf node
-    }
-
-    // Toggle children on click.
-    function click(d) {
-      if (d3.event.defaultPrevented) return; // ignore drag
-      if (d.children) {
-        d._children = d.children;
-        d.children = null;
-      } else {
-        d.children = d._children;
-        d._children = null;
-      }
-      update();
-    }
-
-    // Returns a list of all nodes under the root.
-    function flatten(root) {
-      var nodes = [], i = 0;
-
-      function recurse(node) {
-        if (node.children) node.children.forEach(recurse);
-        if (!node.id) node.id = ++i;
-        nodes.push(node);
-      }
-
-      recurse(root);
-      return nodes;
-    }
-    </script>
     <div id="container" style="left: 0px;">
         <section id="content">
             
 <header>
     <div id="pfd">
         <a href="templates/index.html">
-            <img src="images/pyaari-logo.png" alt="Pyaari Website - For Website and Graphic Designers">
+            <img src="images/pyaari-logo.png" alt="TEST LOGO">
         </a>
     </div>
+    
+    <div id="test_graph"></div>
+
     <div id="preamble" class="home">
         <div class="preamble">
-	<h1>
-		Today’s monthly freebie, Pyaari responsive HTML5 template built on twitter bootstrap grid system. It’s a wonderful template fits the needs of companies that operate in the field of creativity and innovation also can be user for a one page products showcase.</h1>
-	<p class="em" style="display: none;">
-		If you are interested in contributing to this site and have something you would like to share by writing an article or offering freebies, please don’t hesitate to <a href="mailto:contact@198seven.com">write me an email</a></p>
-	<a class="read-more" href="#">Read more +</a></div>
-<p>&nbsp;
-	</p>
+                <h1>
+                    HTML5 template 
+                </h1>
+            <p class="em" style="display: none;">
+                If you are interested in contributing to this site and have something you would like to share by writing an article or offering freebies, please don’t hesitate to <a href="mailto:">write me an email</a></p>
+            <a class="read-more" href="#">Read more +</a>
+        </div>
+        <p>&nbsp;</p>
 
     </div>
 </header>
 <div id="our-work">
     <ul>
-<!--li><a href="templates/project-detail-page.html"><img src="images/work/project-1.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a></li>
+<li><a href="templates/project-detail-page.html"><img src="images/work/project-1.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a></li>
 <li><a href="templates/project-detail-page.html"><img src="images/work/project-2.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a></li>
 <li><a href="templates/project-detail-page.html"><img src="images/work/project-3.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li>
 <li><a href="templates/project-detail-page.html"><img src="images/work/project-4.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Illustration</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a></li>
-<li><a href="templates/project-detail-page.html"><img src="images/work/project-5.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a></li-->
-<li><a href="templates/project-detail-page.html"><img src="images/work/project-7.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li><br>
-<!--li><a href="templates/project-detail-page.html"><img src="images/work/project-8.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Illustration</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a></li>
+<li><a href="templates/project-detail-page.html"><img src="images/work/project-5.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a></li>
+<li><a href="templates/project-detail-page.html"><img src="images/work/project-7.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Test</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li><br>
+<li><a href="templates/project-detail-page.html"><img src="images/work/project-8.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Illustration</h2><h3>Pencil work, Adobe illustrator</h3></summary><div class="loves"><span>77</span></div></div></a></li>
 <li><a href="templates/project-detail-page.html"><img src="images/work/project-9.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a></li>
 <li><a href="templates/project-detail-page.html"><img src="images/work/project-10.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li>
 <li><a href="templates/project-detail-page.html"><img src="images/work/project-11.jpg" alt="Pyaari"><div class="overlay"><summary><h2>Chaosina</h2><h3>Identity, Website &amp; Photography</h3></summary><div class="loves"><span>22</span></div></div></a></li>
-<li><a href="templates/project-detail-page.html"><img src="images/work/project-6.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li-->
+<li><a href="templates/project-detail-page.html"><img src="images/work/project-6.jpg" alt="Pyaari"><div class="overlay"><summary><h2>198seven</h2><h3>Website &amp; Brandind</h3></summary><div class="loves"><span>12</span></div></div></a></li>
 
 </ul>
 </div>
@@ -214,6 +111,7 @@
     <script src="ajax/jquery-1.11.0.min.js"></script>
     <script src="scripts/pyaari-main.1.0.js"></script>
     <script src="scripts/pyaari-menu.1.0.js"></script>
+    <script src="scripts/data_vis.js"></script>
     
     <script>
         $(document).ready(function () {
