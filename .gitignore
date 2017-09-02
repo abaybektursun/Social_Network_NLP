@@ -1,3 +1,4 @@
+*.dbcredentials
 saved_session*
 *.fbtoken
 *.log

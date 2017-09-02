@@ -1,0 +1,2 @@
+CREATE DATABASE indeed;
+CREATE DATABASE glassdoor;
