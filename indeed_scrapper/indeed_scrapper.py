@@ -96,7 +96,7 @@ def run(comp_name='',manual=False):
     if comp_name: COMPANY_NAME = comp_name
     if not manual: EXPORT_JSON = False; EXPORT_CSV = False; EXPORT_DB = True;
     regex = re.compile('[^a-zA-Z]')
-    TABLE_NAME = regex.sub('_', COMPANY_NAME)
+    TABLE_NAME = '`'+regex.sub('_', '{}'.format(COMPANY_NAME) )+'`'
 
 
     # Connect to the database
@@ -130,6 +130,7 @@ def run(comp_name='',manual=False):
     try:
         total_num_reviews = int(re.sub("\D", "", soup.find(attrs={"class":"cmp-filter-result"}).string))
     except Exception as e:
+        print(soup)
         total_num_reviews = int(re.sub("\D", "", manual_string(soup) ) )
     #.......................................................................................................................................................
     
@@ -195,24 +196,30 @@ def run(comp_name='',manual=False):
                 reviews_list.append(a_review)
                 
                 if EXPORT_DB:
-                    try: dml = 'INSERT INTO indeed.{} VALUES("{}",{},{},{},{},{},{},"","{}","{}","{}","{}","{}","{}","{}")'.format(
+                    dml = 'INSERT INTO indeed.{} VALUES("{}",{},{},{},{},{},{},"{}","{}","{}","{}","{}","{}","{}","{}")'.format(
                          TABLE_NAME, review_id, overall_review_score, 
                          scores_dict["Job_Work_Life_Balance"], 
                          scores_dict["Compensation_Benefits"],
                          scores_dict["Job_Security_Advancement"],
                          scores_dict["Management"],
                          scores_dict["Job_Culture"],
-                         poster_role, review_title, status,
-                         poster_location,
+                         str(poster_role).encode('utf-8'), 
+                         str(review_title).encode('utf-8'),
+                         str(status).encode('utf-8'),
+                         str(poster_location).encode('utf-8'),
                          str(datetime.strptime(post_date, '%B %d, %Y')), 
-                         review_text, pros, cons
-                    ); DB_cursor.execute(dml)
-                         
+                         str(review_text).encode('utf-8'), str(pros).encode('utf-8'), str(cons).encode('utf-8')
+                    )
+ 
+                    try: DB_cursor.execute(dml);
                     except pymysql.err.InternalError as e:
                         print(dml)
                         code, msg = e.args
                         print('PyMySQL error: ' + str(code))
-                        if code == 1050: logging.error(str(msg))
+                        #print(msg)	
+                        if code == 1062: logging.error(str(msg))
+                    except Exception as ex: 
+                        if "1062" in str(ex): logging.warning("Review " + review_id + " already exists in the database")
                 #print(a_review)
                 #print("--------------------------------------------------------------")
             logging.info('# processed reviews from the page: {}'.format(len(reviews_list)))
@@ -228,5 +235,6 @@ def run(comp_name='',manual=False):
         
         logging.info('# scraped reviews: {}, # reviews according to website: {}'.format(total_reviews_fact,total_num_reviews))
         json_file.write(']')
-    connection.commit
+
+    connection.commit() 
     connection.close() 

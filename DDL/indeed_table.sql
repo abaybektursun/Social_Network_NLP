@@ -9,7 +9,7 @@ CREATE TABLE indeed.{}(
     poster_role              VARCHAR(90),
     review_title             VARCHAR(90),
     poster_status            VARCHAR(60),
-    psoter_location          VARCHAR(60),
+    poster_location          VARCHAR(60),
     post_date                DATETIME,
     review_text              TEXT,
     pros                     TEXT,
