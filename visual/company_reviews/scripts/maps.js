@@ -1,33 +1,66 @@
 
 function tooltipHtml(n, d){	/* function to create html content string in tooltip div. */
 	return "<h4>"+n+"</h4><table>"+
-		"<tr><td>Low</td><td>"+(d.low)+"</td></tr>"+
-		"<tr><td>Average</td><td>"+(d.avg)+"</td></tr>"+
-		"<tr><td>High</td><td>"+(d.high)+"</td></tr>"+
+		"<tr><td>Score</td><td>"+(d.score)+"</td></tr>"+
+		"<tr><td>Score</td><td>"+(d.score)+"</td></tr>"+
 		"</table>";
 }
 
-var sampleData ={};	/* Sample random data. */
 
-["HI", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
+var sampleData = {};	/* Sample random data. */
+var reviews = [];
+
+function ajax1() {
+  return $.getJSON( "/us_map_data", function( json ) {
+      reviews = json;
+ });
+};
+
+$.when(ajax1()).done(function(a1){
+    // the code here will be executed when all four ajax requests resolve.
+    // a1, a2, a3 and a4 are lists of length 3 containing the response text,
+    // status, and jqXHR object for each of the four ajax calls respectively.
+    ["HI", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
 "ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH", 
 "MI", "WY", "MT", "ID", "WA", "DC", "TX", "CA", "AZ", "NV", "UT", 
 "CO", "NM", "OR", "ND", "SD", "NE", "IA", "MS", "IN", "IL", "MN", 
 "WI", "MO", "AR", "OK", "KS", "LS", "VA"]
 .forEach(
     function(d){ 
-	    var low=Math.round(100*Math.random()), 
-	    	mid=Math.round(100*Math.random()), 
-	    	high=Math.round(100*Math.random());
+	    var score=0, 
+            num_records=0,
+	    	mid=1, 
+	    	high=2;
+        for(var i = 0; i < reviews.length; i++)
+        {
+          
+          if(reviews[i].state === d)
+          {
+              num_records += 1;
+              score += reviews[i].overall_review_score;
+          }
+        }
+        score /= num_records;
+        var color;
+        if (num_records == 0){
+            color = "#ffffff";
+        }
+        else{
+            color = d3.interpolate("#800026","#ffffcc")(score/5);
+        }
 	    sampleData[d]={
-            low:d3.min([low,mid,high]), 
-            high:d3.max([low,mid,high]), 
-	        avg:Math.round((low+mid+high)/3), color:d3.interpolate("#ffffcc", "#800026")(low/100)
-        }; 
+            score:score, 
+            high:2, 
+	        avg:1, color:color
+        };
     }
 );
 
 /* draw states on id #statesvg */	
 uStates.draw("#statesvg", sampleData, tooltipHtml);
-
 d3.select(self.frameElement).style("height", "600px"); 
+});
+
+
+
+

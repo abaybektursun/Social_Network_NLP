@@ -26,11 +26,15 @@ EXPORT_DB     = False
 COMPANY_NAME  = ''
 
 # Right working directory
-os.chdir(SOURCE_PATH)
+#os.chdir(SOURCE_PATH)
 
 # Set up logs
 if not os.path.exists(LOGS_FOLDER):
     os.makedirs(LOGS_FOLDER)
+# Set up data folder
+if not os.path.exists('data'):
+    os.makedirs('data')
+
 
 logging.basicConfig(format='%(levelname)s\t%(asctime)s\t%(message)s', filename='{}/{}'.format(LOGS_FOLDER,LOG_FILE_NAME), datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 logging.info('Application has started')
