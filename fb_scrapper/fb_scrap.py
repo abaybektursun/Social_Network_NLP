@@ -24,6 +24,7 @@ configs.read('config.ini')
 page = configs['default']['page_id']
 REQ_ATTEMPTS = int(configs['default']['REQ_ATTEMPTS'])
 TIMEOUT      = int(configs['default']['TIMEOUT'])
+EXPORT_DB    = configs['default'].getboolean('EXPORT_DB'  )
 EXPORT_CSV   = configs['default'].getboolean('EXPORT_CSV' )
 EXPORT_JSON  = configs['default'].getboolean('EXPORT_JSON')
 

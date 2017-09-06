@@ -6,18 +6,30 @@
     <!-- Meta info -->
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Project Detail | 198seven</title>
+    <title>Topic Modeling</title>
     <meta content="" name="description" />
     <link rel="Shortcut Icon" type="image/x-icon" href="#" />
     
-	<link href="templates/project-detail-page.html" rel="next" />
+	<link href="templates/topic_modeling.html" rel="next" />
 	<link href="templates/index.html" rel="prev" />
     <meta name="author" content="" />
     <meta name="format-detection" content="" />
 
     <!-- Styles -->
     <link href="styles/main.css" rel="stylesheet" media="screen, print" type="text/css" />
+    <link href="styles/maps.css" rel="stylesheet" type="text/css">
     <script src="lib/modernizr-2.6.2.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    
+    <!-- Include jQuery Mobile stylesheets -->
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    
+    <!-- Include the jQuery library -->
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    
+    <!-- Include the jQuery Mobile library -->
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    
 </head>
 <body>
     <div id="container">
@@ -27,28 +39,36 @@
 	<div id="work-bio">
 		<header>
 			<div id="pfd">
-				<a href="templates/index.html">
-            		<img src="images/pyaari-logo.png" alt="Pyaari Website - For Website and Graphic Designers">
+				<a href="/">
+            		<img src="images/site_logo.png" alt="logo">
         		</a>
             </div>
             
 			<div id="preamble">
-                <h1>Pyaari</h1>
-                <h2>Free Responsive HTML5 Template - By 198seven</h2>
-                <p>198seven is a place where you can find quality professional themes, creative tips and inspirations across web development, web design, graphic design and more.</p>
-				<p>Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera.</p>
-				<p class="space-after">que logro hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original.</p>
-				<h3>Services</h3>
-				<p class="space-after">Identity, E-commerce Website Design & Development</p>
-				<p><a href="http://www.198seven.com/" rel="external" target="_blank">Visit website</a></p>
+                <h1>Maps</h1>
+                <h2>Sample Description</h2>
+                <p>Test</p>
+				<p>Sample</p>
+				<p class="space-after">test</p>
+				<h3>Companies</h3>
+				<p class="space-after">Chose a company below</p>
+                
+                
+                
+                <fieldset data-role="controlgroup" data-iconpos="right"> 
+                    <input type="checkbox" name="checkbox-h-6a" id="checkbox-h-6a">
+                    <label for="checkbox-h-6a" id="checkbox-h-6a_label">Hewlett Packard Enterprise</label>
+                    <input type="checkbox" name="checkbox-h-6b" id="checkbox-h-6b">
+                    <label for="checkbox-h-6b">DXC Technology</label>
+                    <input type="checkbox" name="checkbox-h-6c" id="checkbox-h-6c">
+                    <label for="checkbox-h-6c">Computer Sciences Corporation</label>
+                </fieldset> 
+
 			</div>
             
             <ul id="links">
                 <li>
-                    <a href="templates/index.html" id="home">Home</a>
-                </li>
-                <li>
-                    <a id="ilovethis"><span>77</span></a>
+                    <a href="/" id="home">Home</a>
                 </li>
             </ul>
 		</header>
@@ -56,13 +76,16 @@
     
     <section id="work-visuals">
     	<ul>
-			<li data-visual="website-design-florentina-norfolk"><img src="images/work/project-detail-1.jpg">
+			<li id="map_1">
+                <div id="tooltip"></div><!-- div to hold tooltip. -->
+                <svg width="960" height="800" id="statesvg"></svg> <!-- svg to hold the map. -->
+                <script src="scripts/uStates.js"></script> <!-- creates uStates. -->
 		&nbsp;</li>
-			<li data-visual="florentina-logo-design"><img src="images/work/project-detail-2.jpg">
+			<li id="map_2">
 		&nbsp;</li>
-			<li data-visual="ipad-website-design-florentina-events"><img src="images/work/project-detail-3.jpg">
+			<li data-visual="ipad-website-design-florentina-events"><img src="http://via.placeholder.com/1600x1250">
 		&nbsp;</li>
-			<li data-visual="florentina-website-design-full-page"><img src="images/work/project-detail-4.jpg">
+			<li data-visual="florentina-website-design-full-page"><img src="http://via.placeholder.com/1600x1250">
 		&nbsp;</li>
 		</ul>
     </section>
@@ -85,18 +108,15 @@
             <div class="wrapper">
                 <ul id="lets-be-social">
                     <li>
-                        <a href="https://twitter.com/198sevenblog" rel="external" target="_blank" title="Follow 198seven on Twitter">Twitter.</a>
+                        <a href="https://twitter.com/" rel="external" target="_blank" title="Twitter">Twitter.</a>
                     </li>
                     <li>
-                        <a href="https://www.facebook.com/198sevenblog" rel="external" target="_blank" title="Be 198seven Facebook friend">Facebook.</a>
+                        <a href="https://www.facebook.com/" rel="external" target="_blank" title="Be Facebook friend">Facebook.</a>
                     </li>
                     <li>
-                        <a href="http://www.pinterest.com/198seven" rel="external" target="_blank" title="My Pinterest pins">Pinterest.</a>
+                        <a href="http://www.pinterest.com/" rel="external" target="_blank" title="Pinterest">Pinterest.</a>
                     </li>
                 </ul>
-                <div id="legal">
-                 <span>Handcrafted by<br>198seven &copy; 2014 PYAARI</span>
-                </div>
             </div>
         </footer>
     </div><!-- container -->
@@ -115,8 +135,8 @@
     <div id="no-script">
         <div>
             <p>
-                The Pyaari website is fully responsive and requires Javascript.<br />
-                Please <a href="http://enable-javascript.com/">enable javascript</a> to use this site without issue.</p>
+                This website is fully responsive and requires Javascript.<br/>
+            </p>
         </div>
     </div><!-- no-script -->
     
@@ -125,6 +145,7 @@
     <script src="lib/jquery-ext.js"></script>
   	<script src="scripts/pyaari-main.1.0.js"></script>
     <script src="scripts/pyaari-menu.1.0.js"></script>
+    <script src="scripts/maps.js"></script>
     <script>
         $(document).ready(function () {
             PfdMenu._ctor();

@@ -2,16 +2,28 @@
 
 Service File: `/etc/systemd/system/company_reviews.service` 
 
-Commands to start the service
-`
-sudo systemctl start myproject
-sudo systemctl enable myproject
-sudo systemctl restart myproject
-`
+Commands to start the service:
 
-Server block configuration file: `/etc/nginx/sites-available/company_reviews` symlink in `/etc/nginx/sites-enabled`
+```bash
+sudo systemctl start   company_reviews
+sudo systemctl enable  company_reviews
+sudo systemctl restart company_reviews
+```
 
-To verify syntax of the server configs: `sudo nginx -t`
+Server block configuration file: `/etc/nginx/sites-available/company_reviews` , symlink in `/etc/nginx/sites-enabled`
 
-Restart the server: `sudo systemctl restart nginx`
-Tell firewall to let traffic in and out ofthe web server: `sudo ufw allow 'Nginx Full'`
+To verify syntax of the server configs: 
+```bash
+sudo nginx -t
+```
+
+Restart the server: 
+
+```bash
+sudo systemctl restart nginx
+```
+
+Tell firewall to let traffic in and out ofthe web server: 
+```bash
+sudo ufw allow 'Nginx Full'
+```
