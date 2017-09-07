@@ -58,7 +58,11 @@ $.when(ajax1()).done(function(a1){
 
 /* draw states on id #statesvg */	
 uStates.draw("#statesvg", sampleData, tooltipHtml);
-d3.select(self.frameElement).style("height", "600px"); 
+d3.select(self.frameElement)
+    .style("height", "600px")
+    .classed("svg-container", true)
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .classed("svg-content-responsive", true); 
 });
 
 

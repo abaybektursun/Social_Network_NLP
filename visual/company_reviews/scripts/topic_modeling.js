@@ -17,7 +17,7 @@ var svg = d3.select("#list_1").append("svg")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")").classed("svg-content-responsive", true);
 
 d3.json("graph.json", 
     function(error, flare) {
