@@ -1,7 +1,7 @@
 import time
 import json
 import sys
-import Review
+import Review2
 from bs4 import BeautifulSoup
 import lxml
 from selenium import webdriver
@@ -15,7 +15,7 @@ username = # your email here
 password = # your password here
 
 # Manual options for the company, num pages to scrape, and URL
-pages = 595 #5
+pages = 5 #to test
 #DXC= 88 pages
 #HPE: = 542
 #CSC = 595
@@ -23,13 +23,14 @@ source = "Glassdoor"
 
 if (sys.argv[1] =='DXC'):
 	companyName = "DXC-Technology"
-	companyURL = "https://www.glassdoor.com/Reviews/DXC-Technology-Reviews-E1603125.htm"
+	companyURL = "https://www.glassdoor.com/Reviews/DXC-Technology-Reviews-E1603125.htm?sort.sortType=RD&sort.ascending=false"
 elif (sys.argv[1] =='HPE'):
 	companyName = "Hewlett-Packard-Enterprise"
-	companyURL = "https://www.glassdoor.com/Reviews/Hewlett-Packard-Enterprise-HPE-Reviews-E1093046.htm"
+	companyURL = "https://www.glassdoor.com/Reviews/Hewlett-Packard-Enterprise-HPE-Reviews-E1093046.htm?sort.sortType=RD&sort.ascending=false"
 elif (sys.argv[1]=='CSC'):
 	companyName = "CSC"
-	companyURL = "https://www.glassdoor.com/Reviews/CSC-Reviews-E169.htm"
+	#companyURL = "https://www.glassdoor.com/Reviews/CSC-Reviews-E169.htm"
+	companyURL = "https://www.glassdoor.com/Reviews/CSC-Reviews-E169.htm?sort.sortType=RD&sort.ascending=false"
 else: 
 	companyName = ""
 	companyURL = ""
@@ -77,11 +78,17 @@ def parse_reviews_HTML(reviews, data, counter):
 	for review in reviews:	
 		recommend = "-"
 		summary = "-"
-		date = review.find("time", { "class" : "date" }).getText().strip()
+		date = review.find("time", { "class" : "date" })
+		if (date):
+			date = review.find("time", { "class" : "date" }).getText().strip()
 		#title = review.find("span", { "class" : "summary"}).getText().strip()
 		title = review.find("span", { "class" : "summary"}).getText().encode('utf-8').strip()
 		#role = review.find("span", { "class" : "authorJobTitle"}).getText().strip()
 		role = review.find("span", { "class" : "authorJobTitle"}).getText().encode('utf-8').strip()
+		location = review.find("span", { "class" : "authorLocation"})
+		if (location):
+			location = review.find("span", { "class" : "authorLocation"}).getText().encode('utf-8').strip()
+		#endif
 		outcomes = review.find_all("div", { "class" : ["tightLt", "col"] })
 		if (len(outcomes) > 0):
 			recommend = outcomes[0].find("span", { "class" : "middle"}).getText().strip()
@@ -115,7 +122,7 @@ def parse_reviews_HTML(reviews, data, counter):
 			#advicetomgt = advicetomgt.getText().strip()
 			advicetomgt = advicetomgt.getText().encode('utf-8').strip()
 		#endif
-		r = Review.Review(source, reviewid, date, title, role, recommend, summary, pros, cons, advicetomgt)
+		r = Review2.Review(source, reviewid, date, title, role, location, recommend, summary, pros, cons, advicetomgt)
 		reviewid = reviewid + 1
 		data.append(r)
 	#endfor
@@ -128,11 +135,16 @@ def get_data(driver, URL, startPage, endPage, data, refresh):
 	#endif
 	print "\nPage " + str(startPage) + " of " + str(endPage)
 	#currentURL = URL + "_IP" + str(startPage) + ".htm"
-	if (startPage == 1):
+	'''if (startPage == 1):
 		currentURL = URL + ".htm"
 	else:
 		currentURL = URL + "_P" + str(startPage) + ".htm"
-	#endif
+	#endif'''
+	if (startPage == 1):
+		currentURL = URL + ".htm" + "?sort.sortType=RD&sort.ascending=false"
+	else:
+		#currentURL = URL + "_P" + str(startPage) + ".htm"
+		currentURL = URL + "_P" + str(startPage) + ".htm" + "?sort.sortType=RD&sort.ascending=false"
 	time.sleep(2)
 	#endif
 	if (refresh):
@@ -150,7 +162,7 @@ def get_data(driver, URL, startPage, endPage, data, refresh):
 		print "Page " + str(startPage) + " scraped."
 		if (startPage % 10 == 0):
 			print "\nTaking a breather for a few seconds ..."
-			time.sleep(10)
+			time.sleep(5)
 		#endif
 		get_data(driver, URL, startPage + 1, endPage, data, True)
 	else:
@@ -169,6 +181,7 @@ if __name__ == "__main__":
 	time.sleep(5)
 	print "\nStarting data scraping ..."
 	data = get_data(driver, companyURL[:-4], 1, pages, [], True)
+	#data = get_data(driver, companyURL[:-42], 501, 595, [], True) #scraping specific page range
 	print "\nExporting data to " + companyName + "_reviews.json"
 	json_export(data)
 	driver.quit()
