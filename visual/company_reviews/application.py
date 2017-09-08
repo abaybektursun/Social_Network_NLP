@@ -108,6 +108,14 @@ def parse_location(raw_location):
             if res['state'] in pair:
                 res['state'] = pair[1]
                 return res
+    else:
+        for pair in states:
+            if parsed[0].strip() in pair:
+                res['city']    = 'Unknown'
+                res['state']   = pair[1]
+                res['country'] = 'USA'
+                return res
+            
     return None
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -141,6 +149,12 @@ def maps():
 # AJAX data requests @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @app.route('/us_map_data')
 def us_map_data():
+    tbl = "Dxc_Technology"
+    comp = request.args.get('company')
+    if comp: 
+        DB_cursor.execute("SELECT company_table FROM company_reviews.companies WHERE company_name = '{}' ".format(comp))
+        result = DB_cursor.fetchone()
+        tbl = result['company_table']
     req = ''' 
     SELECT 
         review_id               ,
@@ -155,8 +169,8 @@ def us_map_data():
         poster_status           ,
         poster_location         ,
         post_date 
-    FROM indeed.`Dxc_Technology`
-    '''    
+    FROM indeed.`{}`
+    '''.format(tbl)
     DB_cursor.execute(req)
     result = DB_cursor.fetchall()
         
@@ -172,7 +186,6 @@ def us_map_data():
             
     #print(us_data)
     return json.dumps(us_data, default=str)
-
 
 @app.route('/company_names')
 def company_names():

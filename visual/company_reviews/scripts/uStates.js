@@ -66,7 +66,11 @@
 		function mouseOut(){
 			d3.select("#tooltip").transition().duration(500).style("opacity", 0);      
 		}
-		
+        
+		//test
+        d3.select(id).selectAll(".state").remove();
+        //test
+        
 		d3.select(id).selectAll(".state")
 			.data(uStatePaths).enter().append("path").attr("class","state").attr("d",function(d){ return d.d;})
 			.style("fill",function(d){ return data[d.id].color; })
