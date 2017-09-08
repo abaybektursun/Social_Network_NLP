@@ -172,6 +172,16 @@ def us_map_data():
             
     #print(us_data)
     return json.dumps(us_data, default=str)
+
+
+@app.route('/company_names')
+def company_names():
+    DB_cursor.execute("SELECT company_name FROM company_reviews.companies")
+    result = DB_cursor.fetchall()
+    cmp_list = []
+    for a_res in result:
+        cmp_list.append(a_res['company_name'])
+    return json.dumps(cmp_list, default=str)
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 

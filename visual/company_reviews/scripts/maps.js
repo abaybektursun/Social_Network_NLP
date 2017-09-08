@@ -1,8 +1,8 @@
-
+// Draw Default US map -----------------------------------------------------------------------------------------
 function tooltipHtml(n, d){	/* function to create html content string in tooltip div. */
 	return "<h4>"+n+"</h4><table>"+
 		"<tr><td>Score</td><td>"+(d.score)+"</td></tr>"+
-		"<tr><td>Score</td><td>"+(d.score)+"</td></tr>"+
+		"<tr><td>Sample Size</td><td>"+(d.ssize)+"</td></tr>"+
 		"</table>";
 }
 
@@ -16,6 +16,7 @@ function ajax1() {
  });
 };
 
+// Wait until data is arrived
 $.when(ajax1()).done(function(a1){
     // the code here will be executed when all four ajax requests resolve.
     // a1, a2, a3 and a4 are lists of length 3 containing the response text,
@@ -49,7 +50,8 @@ $.when(ajax1()).done(function(a1){
             color = d3.interpolate("#800026","#ffffcc")(score/5);
         }
 	    sampleData[d]={
-            score:score, 
+            score:parseFloat(score).toFixed(2),
+            ssize:num_records,
             high:2, 
 	        avg:1, color:color
         };
@@ -65,6 +67,6 @@ d3.select(self.frameElement)
     .classed("svg-content-responsive", true); 
 });
 
-
-
-
+// Default checked ########################################
+document.getElementById("checkbox-h-6b").checked = true;//#
+//#########################################################
