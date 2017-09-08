@@ -1,8 +1,12 @@
 from indeed_scrapper import run
 
-run()
+run("Xerox")
+run("HP")
+run("Accenture")
+run("Motorola-Solutions")
+run("Cognizant-Technology-Solutions")
+run("Hitachi")
+run("Infosys")
+run("Amadeus-IT-Group-Sa")
 
 
-run("Computer-Science-Corporation")
-run("Dxc-Technology")
-run("Hewlett-Packard-Enterprise")

@@ -3,11 +3,10 @@
 <meta http-equiv="content-type" content="text/html;charset=utf-8" />
 <head>
 
-
     <!-- Meta info -->
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Maps</title>
+    <title>Word Embeddings</title>
     <meta content="" name="description" />
     <link rel="Shortcut Icon" type="image/x-icon" href="#" />
     
@@ -18,7 +17,7 @@
 
     <!-- Styles -->
     <link href="styles/main.css" rel="stylesheet" media="screen, print" type="text/css" />
-    <link href="styles/maps.css" rel="stylesheet" type="text/css">
+    <link href="styles/embeds.css" rel="stylesheet" type="text/css">
     <script src="lib/modernizr-2.6.2.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     
@@ -51,6 +50,7 @@
       });
     });
     </script>
+    
 </head>
 <body>
     <div id="container">
@@ -66,14 +66,16 @@
             </div>
             
 			<div id="preamble">
-                <h1>Maps</h1>
-                <h2>Heat Map of Company Reviews</h2>
-                <p>Hover over the maps to see tooltip with additional details</p>
-				<p>Scroll down the page to see the world map</p>
+                <h1>Neural Word Embeddings</h1>
+                <h2>Skip Gram model (Word2vec)</h2>
+                <p>Word2vec is a group of related models that are used to produce word embeddings. These models are shallow, two-layer neural networks that are trained to reconstruct linguistic contexts of words. Word2vec takes as its input a large corpus of text and produces a vector space, typically of several hundred dimensions, with each unique word in the corpus being assigned a corresponding vector in the space. Word vectors are positioned in the vector space such that words that share common contexts in the corpus are located in close proximity to one another in the space.</p>
+                
 				<h3>Companies</h3>
 				<p class="space-after">Chose a company below</p>
                 
                 
+                
+  
                 <!-- ************************************************************************************************************************ -->
                 <div class="ui-widget" style="width: 50%">
                   <label for="comps"></label>
@@ -94,12 +96,8 @@
     
     <section id="work-visuals">
     	<ul>
-			<li id="map_1">
-                <div id="tooltip"></div><!-- div to hold tooltip. -->
-                <svg width="960" height="800" id="statesvg"></svg> <!-- svg to hold the map. -->
-                <script src="scripts/uStates.js"></script> <!-- creates uStates. -->
-		&nbsp;</li>
-			<li id="map_2">
+			<li id="list_1">
+                <iframe width="900" height="800" frameborder="0" scrolling="no" src="//plot.ly/~Abaybektursun/14.embed"></iframe>
 		&nbsp;</li>
 			<li data-visual="ipad-website-design-florentina-events"><img src="http://via.placeholder.com/1600x1250">
 		&nbsp;</li>
@@ -162,7 +160,7 @@
     <script src="lib/jquery-ext.js"></script>
   	<script src="scripts/pyaari-main.1.0.js"></script>
     <script src="scripts/pyaari-menu.1.0.js"></script>
-    <script src="scripts/maps.js"></script>
+    <script src="scripts/embeds.js"></script>
     <script>
         $(document).ready(function () {
             PfdMenu._ctor();

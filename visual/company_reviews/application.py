@@ -142,6 +142,10 @@ def topic_modeling():
 def maps():
     return render_template('maps.html')
 
+@app.route('/embeds')
+def embeds():
+    return render_template('embeds.html')
+
 
 
 

@@ -21,14 +21,35 @@
     <script src="lib/modernizr-2.6.2.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     
+
+    
     <!-- Include jQuery Mobile stylesheets -->
-    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">    
     
     <!-- Include the jQuery library -->
-    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     
     <!-- Include the jQuery Mobile library -->
     <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    
+    <script>
+    var companies = [];
+    
+    function req_comps() {
+      return $.getJSON( "/company_names", function( json ) {
+          companies = json;
+     });
+    };
+    
+    $.when(req_comps()).done(function(a1){
+      $( "#comps" ).autocomplete({
+        source: companies
+      });
+    });
+    </script>
     
 </head>
 <body>
@@ -55,14 +76,14 @@
                 
                 
                 
-                <fieldset data-role="controlgroup" data-iconpos="right"> 
-                    <input type="checkbox" name="checkbox-h-6a" id="checkbox-h-6a">
-                    <label for="checkbox-h-6a" id="checkbox-h-6a_label">Hewlett Packard Enterprise</label>
-                    <input type="checkbox" name="checkbox-h-6b" id="checkbox-h-6b">
-                    <label for="checkbox-h-6b">DXC Technology</label>
-                    <input type="checkbox" name="checkbox-h-6c" id="checkbox-h-6c">
-                    <label for="checkbox-h-6c">Computer Sciences Corporation</label>
-                </fieldset> 
+  
+                <!-- ************************************************************************************************************************ -->
+                <div class="ui-widget" style="width: 50%">
+                  <label for="comps"></label>
+                  <input id="comps"  placeholder="Company...">
+                  <button id="comps_submit" class="ui-button ui-widget ui-corner-all">Submit</button>
+                </div>
+                <!-- ************************************************************************************************************************  -->
 
 			</div>
             
@@ -137,7 +158,6 @@
         </div>
     </div><!-- no-script -->
     
-  <script src="ajax/jquery-1.11.0.min.js"></script>
     <script src="lib/underscore-min.js"></script>  
     <script src="lib/jquery-ext.js"></script>
   	<script src="scripts/pyaari-main.1.0.js"></script>

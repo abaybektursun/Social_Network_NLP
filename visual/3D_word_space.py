@@ -123,13 +123,15 @@ scatter = dict(
     x = x, y = y, z = z
 )"""
 layout = dict(
-    title = '3d point clustering',
+    title = '3D Semantic Space',
     scene = dict(
         xaxis = dict( zeroline=False ),
         yaxis = dict( zeroline=False ),
         zaxis = dict( zeroline=False ),
-    )
+    ),
+    paper_bgcolor='rgba(0,0,0,0)',
+    plot_bgcolor='rgba(0,0,0,0)'
 )
 
 fig = dict( data=[scatter], layout=layout )
-py.plot(fig, filename='3d point clustering')
+py.plot(fig)
