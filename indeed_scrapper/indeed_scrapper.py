@@ -114,7 +114,7 @@ def run(comp_name='',manual=False):
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         ); 
-        except Exception as ex: exit("Failed to connect to database", 2); logging.error(str(ex))
+        except Exception as ex: logging.error(str(ex)); exit("Failed to connect to database", 2); 
         DB_cursor = connection.cursor()
         # Try to create a table, if already exists
         with open('../DDL/indeed_table.sql', 'r') as DDLfile: ddl = DDLfile.read()
