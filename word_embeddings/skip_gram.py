@@ -154,7 +154,6 @@ with graph.as_default(), tf.device('/gpu:0'):
     # Model.
     # Look up embeddings for inputs.
     embed = tf.nn.embedding_lookup(embeddings, train_dataset)
-    # Compute the softmax loss, using a sample of the negative labels each time.
     
     # Debug
     print("softmax_weights {}".format(softmax_weights)) 
@@ -165,6 +164,7 @@ with graph.as_default(), tf.device('/gpu:0'):
     print("VOCAB_SIZE      {}".format(VOCAB_SIZE))
     
     
+    # Compute the softmax loss, using a sample of the negative labels each time.
     loss = tf.reduce_mean(
         tf.nn.sampled_softmax_loss(
             weights=softmax_weights, 
@@ -203,7 +203,7 @@ with tf.Session(
     for step in range(num_steps):
         batch_x, batch_labels = next_batch(batch_size, num_skips, skip_window)
         feed_dict = {
-            train_dataset : batch_x, 
+            train_dataset: batch_x, 
             train_labels : batch_labels
         }
         _, l = session.run([optimizer, loss], feed_dict=feed_dict)

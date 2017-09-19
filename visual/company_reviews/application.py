@@ -3,9 +3,13 @@
 from flask    import render_template, Flask, jsonify, request
 from datetime import datetime, date, time
 
+import tensorflow as tf
+import numpy      as np
+
 import pymysql.cursors
 import configparser
 import logging
+import pickle
 import json
 import time
 import sys
@@ -38,6 +42,43 @@ try: connection   = pymysql.connect(
 );
 except Exception as ex: exit("Failed to connect to database", 2); logging.error(str(ex))
 DB_cursor = connection.cursor()
+
+# tSNE
+VOCAB_SIZE = 5000
+embedding_size = 128
+with open('../../word_embeddings/key_reverse_hash_map.pkl','rb') as pickleFile:
+    key_reverse_hash_map = pickle.load(pickleFile)
+
+tf.reset_default_graph()
+
+embeddings = tf.get_variable("embeddings",[VOCAB_SIZE, embedding_size])
+norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
+normalized_embeddings = embeddings / norm
+
+saver = tf.train.Saver()
+
+# Use the saver object normally after that.
+with tf.Session() as sess:
+    embeddings.initializer.run()
+    saver.restore(sess, "../../word_embeddings/{}/{}-90000".format(MODEL_FOLDER_NAME, TOPIC) )
+    final_embeddings = normalized_embeddings.eval()
+
+tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
+n_d_embeddings = tsne.fit_transform(final_embeddings[1:NUM_POINTS+1, :])
+
+# Debug
+def plot(embeddings, labels):
+    assert embeddings.shape[0] >= len(labels), 'More labels than embeddings'
+    pylab.figure(figsize=(15,15))  # in inches
+    for i, label in enumerate(labels):
+        x, y = embeddings[i,:]
+        pylab.scatter(x, y)
+        pylab.annotate(label, xy=(x, y), xytext=(5, 2), textcoords='offset points',
+                     ha='right', va='bottom')
+    pylab.show()
+
+words = [key_reverse_hash_map[i] for i in range(1, NUM_POINTS+1)]
+
 ###########################################################################################################################################################################
 
 
@@ -200,6 +241,13 @@ def company_names():
     for a_res in result:
         cmp_list.append(a_res['company_name'])
     return json.dumps(cmp_list, default=str)
+
+@app.route('/w2v')
+def w2v():
+    word = request.args.get('word')
+    return
+
+
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
