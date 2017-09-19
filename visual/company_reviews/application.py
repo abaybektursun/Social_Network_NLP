@@ -44,7 +44,7 @@ except Exception as ex: exit("Failed to connect to database", 2); logging.error(
 DB_cursor = connection.cursor()
 
 # tSNE
-VOCAB_SIZE = 5000
+"""VOCAB_SIZE = 5000
 embedding_size = 128
 with open('../../word_embeddings/key_reverse_hash_map.pkl','rb') as pickleFile:
     key_reverse_hash_map = pickle.load(pickleFile)
@@ -77,7 +77,7 @@ def plot(embeddings, labels):
                      ha='right', va='bottom')
     pylab.show()
 
-words = [key_reverse_hash_map[i] for i in range(1, NUM_POINTS+1)]
+words = [key_reverse_hash_map[i] for i in range(1, NUM_POINTS+1)]"""
 
 ###########################################################################################################################################################################
 
@@ -246,7 +246,6 @@ def company_names():
 def w2v():
     word = request.args.get('word')
     return
-
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 

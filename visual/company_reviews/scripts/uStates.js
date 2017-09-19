@@ -54,7 +54,7 @@
 	];
 	var uStates={};
 		
-	uStates.draw = function(id, data, toolTip){		
+	uStates.draw = function(id, data, toolTip){
 		function mouseOver(d){
 			d3.select("#tooltip").transition().duration(200).style("opacity", .9);      
 			

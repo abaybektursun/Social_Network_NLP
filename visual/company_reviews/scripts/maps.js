@@ -30,7 +30,6 @@ function render_us_map(){
                     high=2;
                 for(var i = 0; i < reviews.length; i++)
                 {
-                    
                     if(reviews[i].state === d)
                     {
                         num_records += 1;

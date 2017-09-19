@@ -2,8 +2,42 @@
 
 from sklearn.decomposition           import NMF, LatentDirichletAllocation
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from datetime                        import datetime, date, time
 
+
+import pymysql.cursors
+import configparser
+import logging
+import pickle
 import json
+import time
+import sys
+import os
+import re
+
+####################################################################################################################################
+LOG_FILE_NAME = 'topics_{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H%M%S"))
+LOGS_FOLDER   = 'logs'
+
+# Set up logs
+if not os.path.exists(LOGS_FOLDER):
+    os.makedirs(LOGS_FOLDER)
+logging.basicConfig(format='%(levelname)s\t%(asctime)s\t%(message)s', filename='{}/{}'.format(LOGS_FOLDER,LOG_FILE_NAME), datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+logging.info('Application has started')
+
+# Database
+dbconfigs = configparser.ConfigParser()
+dbconfigs.read('../msql.dbcredentials')
+try: connection   = pymysql.connect(
+    host     = dbconfigs['default']['HOST'],
+    user     = dbconfigs['default']['USER'],
+    password = dbconfigs['default']['PASS'],
+    charset='utf8mb4',
+    cursorclass=pymysql.cursors.DictCursor
+);
+except Exception as ex: exit("Failed to connect to database", 2); logging.error(str(ex))
+DB_cursor = connection.cursor()
+####################################################################################################################################
 
 def extract(model, feature_names, no_top_words):
     clusters = []
@@ -14,12 +48,6 @@ def extract(model, feature_names, no_top_words):
             features.append({"name": a_component, "size": 4500})
         clusters.append({"name":"Cluster {}".format(topic_idx) ,"children":features})
     return clusters
-
-FILE_NAME =  "Hewlett-Packard-Enterprise_reviews.json"
-FILE_PATH =  "../indeed_scrapper/" + FILE_NAME
-
-NUM_FEATURES = 1000
-NUM_TOPICS   = 5
 
 
 def NMF(content):
@@ -51,18 +79,33 @@ def LDA(content):
     no_top_words = 10
     return extract(lda, count_feature_names, no_top_words)
 
-with open(FILE_PATH) as content_file, open("graph.jon","w") as json_out:
-    json_content = json.loads(content_file.read())
-    pros = []; cons = []; reviews = [];
-    for a_review in json_content:
-        if a_review['pros']: pros.append(a_review['pros'])
-        if a_review['cons']: cons.append(a_review['cons'])
-        if a_review['review_text']: reviews.append(a_review['review_text'])
-    pro_cluster = LDA(pros)
-    con_cluster = LDA(cons)
-    rev_cluster = LDA(reviews)
-     
-    json.dump({
-        "name":"Hewlett Packard Enterprise", 
-        "children": [{"name":"Cons","children":con_cluster}, {"name":"Pros","children":pro_cluster}, {"name":"General Review","children":rev_cluster}]
-    }, json_out, indent=4)
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------
+DB_cursor.execute("SELECT * FROM company_reviews.companies")
+result   = DB_cursor.fetchall()
+cmp_list = []
+for a_res in result:
+    cmp_list.append(a_res['company_table'])
+
+NUM_FEATURES = 1000
+NUM_TOPICS   = 5
+for a_cmp in cmp_list:
+    DB_cursor.execute("SELECT * FROM indeed." + a_cmp)
+    result   = DB_cursor.fetchall()     
+    with open('topics_'+a_cmp.lower()+".json","w") as json_out:
+        pros = []; cons = []; reviews = [];
+        for a_review in result:
+            if a_review['pros']: pros.append(a_review['pros'])
+            if a_review['cons']: cons.append(a_review['cons'])
+            if a_review['review_text']: reviews.append(a_review['review_text'])
+        pro_cluster = LDA(pros)
+        con_cluster = LDA(cons)
+        rev_cluster = LDA(reviews)
+         
+        json.dump({
+            "name":a_cmp.replace('_',' '), 
+            "children": [{"name":"Cons","children":con_cluster}, {"name":"Pros","children":pro_cluster}, {"name":"General Review","children":rev_cluster}]
+        }, json_out, indent=4)
+    
+# Housekeeping ############################################################################################
+DB_cursor.close()
+connection.close()
