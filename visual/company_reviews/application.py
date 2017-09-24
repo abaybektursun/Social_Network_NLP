@@ -33,6 +33,10 @@ sys.path.append('../../indeed_scrapper/')
 # Database
 dbconfigs = configparser.ConfigParser()
 dbconfigs.read('msql.dbcredentials')
+dbhost     = dbconfigs['default']['HOST']
+dbuser     = dbconfigs['default']['USER']
+dbpassword = dbconfigs['default']['PASS']
+"""
 try: connection   = pymysql.connect(
     host     = dbconfigs['default']['HOST'],
     user     = dbconfigs['default']['USER'],
@@ -40,8 +44,10 @@ try: connection   = pymysql.connect(
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 );
-except Exception as ex: exit("Failed to connect to database", 2); logging.error(str(ex))
+except Exception as ex: logging.error(str(ex)); exit("Failed to connect to database", 2);
 DB_cursor = connection.cursor()
+DB_cursor.close()
+connection.close()"""
 
 # tSNE
 """VOCAB_SIZE = 5000
@@ -141,7 +147,7 @@ def parse_location(raw_location):
     res = {}
     tmp = re.sub(r'[^a-zA-Z0-9, ]', '', raw_location.replace("B'",''))
     subbed = re.sub(r'[ ]+', ' ', tmp)
-    parsed = str(subbed).split(',')    
+    parsed = str(subbed).split(',')
     if len(parsed) > 1:
         res['city']    = parsed[0].strip()
         res['state']   = parsed[1].strip()
@@ -157,7 +163,7 @@ def parse_location(raw_location):
                 res['state']   = pair[1]
                 res['country'] = 'USA'
                 return res
-            
+
     return None
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -195,14 +201,24 @@ def embeds():
 # AJAX data requests @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @app.route('/us_map_data')
 def us_map_data():
+    try: connection   = pymysql.connect(
+        host     = dbhost,
+        user     = dbuser,
+        password = dbpassword,
+        charset='utf8mb4',
+        cursorclass=pymysql.cursors.DictCursor
+    );
+    except Exception as ex: logging.error(str(ex))
+    DB_cursor = connection.cursor()
+
     tbl = "Dxc_Technology"
     comp = request.args.get('company')
-    if comp: 
+    if comp:
         DB_cursor.execute("SELECT company_table FROM company_reviews.companies WHERE company_name = '{}' ".format(comp))
         result = DB_cursor.fetchone()
         tbl = result['company_table']
-    req = ''' 
-    SELECT 
+    req = '''
+    SELECT
         review_id               ,
         overall_review_score    ,
         job_work_life_balance   ,
@@ -214,12 +230,12 @@ def us_map_data():
         review_title            ,
         poster_status           ,
         poster_location         ,
-        post_date 
+        post_date
     FROM indeed.`{}`
     '''.format(tbl)
     DB_cursor.execute(req)
     result = DB_cursor.fetchall()
-        
+
     us_data = []
     for a_res in result:
         cpy = a_res.copy()
@@ -229,17 +245,32 @@ def us_map_data():
             cpy['city']    = geo['city']
             cpy['state']   = geo['state']
             us_data.append(cpy)
-            
+
     #print(us_data)
+    DB_cursor.close()
+    connection.close()
     return json.dumps(us_data, default=str)
 
 @app.route('/company_names')
 def company_names():
+    connection = None
+    try: connection   = pymysql.connect(
+        host     = dbhost,
+        user     = dbuser,
+        password = dbpassword,
+        charset='utf8mb4',
+        cursorclass=pymysql.cursors.DictCursor
+    );
+    except Exception as ex: logging.error(str(ex))
+    DB_cursor = connection.cursor()
     DB_cursor.execute("SELECT company_name FROM company_reviews.companies")
     result = DB_cursor.fetchall()
     cmp_list = []
     for a_res in result:
         cmp_list.append(a_res['company_name'])
+
+    DB_cursor.close()
+    connection.close()
     return json.dumps(cmp_list, default=str)
 
 @app.route('/w2v')

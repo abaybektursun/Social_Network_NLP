@@ -15,4 +15,4 @@ word_embeddings/data.txt
 *.pkl
 visual/company_reviews/company_reviewsenv/
 visual/company_reviews/__pycache__/
-
+.idea
