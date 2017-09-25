@@ -7,8 +7,11 @@ function tooltipHtml(n, d){	/* function to create html content string in tooltip
 }
 
 
-var sData = {};	/* Sample random data. */
+var sData = {};
 var reviews = [];
+var reviews_swp = [];
+var score_field = "overall_review_score";
+var min_date, max_date;
 
 function ajax1() {
   return $.getJSON( "/us_map_data", function( json ) {
@@ -18,22 +21,24 @@ function ajax1() {
 
 function render_us_map(){
         ["HI", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
-         "ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH", 
-         "MI", "WY", "MT", "ID", "WA", "DC", "TX", "CA", "AZ", "NV", "UT", 
-         "CO", "NM", "OR", "ND", "SD", "NE", "IA", "MS", "IN", "IL", "MN", 
+         "ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH",
+         "MI", "WY", "MT", "ID", "WA", "DC", "TX", "CA", "AZ", "NV", "UT",
+         "CO", "NM", "OR", "ND", "SD", "NE", "IA", "MS", "IN", "IL", "MN",
          "WI", "MO", "AR", "OK", "KS", "LS", "VA"]
             .forEach(
-            function(d){ 
-                var score=0, 
+            function(d){
+                var score=0,
                     num_records=0,
-                    mid=1, 
+                    mid=1,
                     high=2;
                 for(var i = 0; i < reviews.length; i++)
                 {
-                    if(reviews[i].state === d)
+                    if(
+											reviews[i].state === d
+										)
                     {
                         num_records += 1;
-                        score += reviews[i].overall_review_score;
+                        score += reviews[i][score_field];
                     }
                 }
                 score /= num_records;
@@ -47,19 +52,19 @@ function render_us_map(){
                 sData[d]={
                     score:parseFloat(score).toFixed(2),
                     ssize:num_records,
-                    high:2, 
+                    high:2,
                     avg:1, color:color
                 };
             }
         );
-    
+
         uStates.draw("#statesvg", sData, tooltipHtml);
         d3.select(self.frameElement)
             .style("height", "600px")
             .classed("svg-container", true)
             .attr("preserveAspectRatio", "xMinYMin meet")
-            .classed("svg-content-responsive", true); 
-   
+            .classed("svg-content-responsive", true);
+
 }
 
 // Wait until data is arrived
@@ -76,16 +81,41 @@ $.when(ajax1()).done(function(a1){
 
 $("#comps_submit")
     .button()
-    .click(function(){ 
+    .click(function(){
         var cmp = document.getElementById('comps').value;
         function get_reviews() {
             return $.getJSON( "/us_map_data", {company: cmp},
                 function( json ) {
                     reviews = json;
                 }
-            );  
+            );
         };
         $.when(get_reviews()).done(function(a1){
             render_us_map()
         })
     });
+
+
+// Filters --------------------------------------------------------------------------------------------------
+var nonLinearSlider = document.getElementById('datef');
+
+noUiSlider.create(nonLinearSlider, {
+	connect: true,
+	behaviour: 'tap',
+	start: [ 0, 100 ],
+	range: {
+		'min': [ 0 ],
+		'max': [ 100 ]
+	}
+});
+
+var node = document.getElementById('inter-values')
+// Display the slider value and how far the handle moved
+// from the left edge of the slider.
+var sliders = [0.0, 0.0];
+nonLinearSlider.noUiSlider.on('update',
+	function ( values, handle, unencoded, isTap, positions ) {
+		sliders[handle] = values[handle];
+		node.innerHTML = sliders[0] + ',' + sliders[1];
+	}
+);

@@ -7,7 +7,7 @@ import json
 import sys
 import os
 
-FILE_NAME     = 'Hewlett-Packard-Enterprise_reviews.json'
+FILE_NAME     = 'data/Hewlett-Packard-Enterprise_reviews.json'
 REQ_ATTEMPTS  = 2
 TIMEOUT       = 1
 

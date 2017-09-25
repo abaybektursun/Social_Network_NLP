@@ -10,7 +10,7 @@
     <title>Maps</title>
     <meta content="" name="description" />
     <link rel="Shortcut Icon" type="image/x-icon" href="#" />
-    
+
 	<link href="templates/topic_modeling.html" rel="next" />
 	<link href="templates/index.html" rel="prev" />
     <meta name="author" content="" />
@@ -20,31 +20,34 @@
     <link href="styles/main.css" rel="stylesheet" media="screen, print" type="text/css" />
     <link href="styles/maps.css" rel="stylesheet" type="text/css">
     <script src="lib/modernizr-2.6.2.js"></script>
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    
 
-    
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+
+    <!-- nouislider -->
+    <link rel="stylesheet" href="styles/nouislider.css">
+    <script src="scripts/nouislider.js"></script>
+
     <!-- Include jQuery Mobile stylesheets -->
-    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">    
-    
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+
     <!-- Include the jQuery library -->
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    
+
     <!-- Include the jQuery Mobile library -->
     <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    
+
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    
+
     <script>
     var companies = [];
-    
+
     function req_comps() {
       return $.getJSON( "/company_names", function( json ) {
           companies = json;
      });
     };
-    
+
     $.when(req_comps()).done(function(a1){
       $( "#comps" ).autocomplete({
         source: companies
@@ -55,7 +58,7 @@
 <body>
     <div id="container">
         <section id="content">
-            
+
 <div id="pfd-work">
 	<div id="work-bio">
 		<header>
@@ -64,7 +67,7 @@
             		<img src="images/site_logo.png" alt="logo">
         		</a>
             </div>
-            
+
 			<div id="preamble">
                 <h1>Maps</h1>
                 <h2>Heat Map of Company Reviews</h2>
@@ -72,8 +75,8 @@
 				<p>Scroll down the page to see the world map</p>
 				<h3>Companies</h3>
 				<p class="space-after">Chose a company below</p>
-                
-                
+
+
                 <!-- ************************************************************************************************************************ -->
                 <div class="ui-widget" style="width: 50%">
                   <label for="comps"></label>
@@ -82,8 +85,21 @@
                 </div>
                 <!-- ************************************************************************************************************************  -->
 
+                <!-- Filters ************************************************************************************************************************  -->
+                <div style="margin-top: 30px">
+                  <p style="margin-bottom: 5px; font-size: 140%;">Filters</p>
+
+                  <div style="margin-bottom: 0px; margin-top: 0px;">
+                    <h3 id="inter-values" style="margin-buttom: 25px"><h3>
+                    <div id="datef" style="margin-top: 10px; margin-buttom: 5px;"></div>
+                  <div>
+
+                  <div style="margin-top: 15px"><button id="apply_filters" class="ui-button ui-widget ui-corner-all" style="width: 80px;">Apply</button></div>
+                </div>
+                <!-- *******************************************************************************************************************************  -->
+
 			</div>
-            
+
             <ul id="links">
                 <li>
                     <a href="/" id="home">Home</a>
@@ -91,7 +107,7 @@
             </ul>
 		</header>
     </div>
-    
+
     <section id="work-visuals">
     	<ul>
 			<li id="map_1">
@@ -107,7 +123,7 @@
 		&nbsp;</li>
 		</ul>
     </section>
-    
+
     <footer>
         <ul id="other-projects">
             <li>
@@ -138,7 +154,7 @@
             </div>
         </footer>
     </div><!-- container -->
-    
+
     <nav id="toc">
         <ul>
             <li>
@@ -149,7 +165,7 @@
                 <a href="templates/what-we-do.html">What we do.</a></li>
         </ul>
 	</nav>
-    
+
     <div id="no-script">
         <div>
             <p>
@@ -157,8 +173,8 @@
             </p>
         </div>
     </div><!-- no-script -->
-    
-    <script src="lib/underscore-min.js"></script>  
+
+    <script src="lib/underscore-min.js"></script>
     <script src="lib/jquery-ext.js"></script>
   	<script src="scripts/pyaari-main.1.0.js"></script>
     <script src="scripts/pyaari-menu.1.0.js"></script>
@@ -168,9 +184,9 @@
             PfdMenu._ctor();
         });
     </script>
-    
+
     <script src="scripts/pyaari-work-bio.1.0.js"></script>
- 
+
 
 </body>
 </html>

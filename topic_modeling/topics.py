@@ -79,6 +79,78 @@ def LDA(content):
     no_top_words = 10
     return extract(lda, count_feature_names, no_top_words)
 
+def parse_location(raw_location):
+    states = [("Alabama","AL"),
+              ("Alaska","AK"),
+              ("Arizona","AZ"),
+              ("Arkansas","AR"),
+              ("California","CA"),
+              ("Colorado","CO"),
+              ("Connecticut","CT"),
+              ("Delaware","DE"),
+              ("District of Columbia","DC"),
+              ("Florida","FL"),
+              ("Georgia","GA"),
+              ("Hawaii","HI"),
+              ("Idaho","ID"),
+              ("Illinois","IL"),
+              ("Indiana","IN"),
+              ("Iowa","IA"),
+              ("Kansas","KS"),
+              ("Kentucky","KY"),
+              ("Louisiana","LA"),
+              ("Maine","ME"),
+              ("Montana","MT"),
+              ("Nebraska","NE"),
+              ("Nevada","NV"),
+              ("New Hampshire","NH"),
+              ("New Jersey","NJ"),
+              ("New Mexico","NM"),
+              ("New York","NY"),
+              ("North Carolina","NC"),
+              ("North Dakota","ND"),
+              ("Ohio","OH"),
+              ("Oklahoma","OK"),
+              ("Oregon","OR"),
+              ("Maryland","MD"),
+              ("Massachusetts","MA"),
+              ("Michigan","MI"),
+              ("Minnesota","MN"),
+              ("Mississippi","MS"),
+              ("Missouri","MO"),
+              ("Pennsylvania","PA"),
+              ("Rhode Island","RI"),
+              ("South Carolina","SC"),
+              ("South Dakota","SD"),
+              ("Tennessee","TN"),
+              ("Texas","TX"),
+              ("Utah","UT"),
+              ("Vermont","VT"),
+              ("Virginia","VA"),
+              ("Washington","WA"),
+              ("West Virginia","WV"),
+              ("Wisconsin","WI"),
+              ("Wyoming","WY")]
+    # temporary simple parse
+    res = {}
+    tmp = re.sub(r'[^a-zA-Z0-9, ]', '', raw_location.replace("B'",''))
+    subbed = re.sub(r'[ ]+', ' ', tmp)
+    parsed = str(subbed).split(',')
+    if len(parsed) > 1:
+        res['city']    = parsed[0].strip()
+        res['state']   = parsed[1].strip()
+        res['country'] = 'USA'
+        for pair in states:
+            if res['state'] in pair:
+                res['state'] = pair[1]
+                return res
+    else:
+        for pair in states:
+            if parsed[0].strip() in pair:
+                res['city']    = 'Unknown'
+                res['state']   = pair[1]
+                res['country'] = 'USA'
+                return res 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------
 DB_cursor.execute("SELECT * FROM company_reviews.companies")
 result   = DB_cursor.fetchall()
@@ -90,13 +162,14 @@ NUM_FEATURES = 1000
 NUM_TOPICS   = 5
 for a_cmp in cmp_list:
     DB_cursor.execute("SELECT * FROM indeed." + a_cmp)
-    result   = DB_cursor.fetchall()     
-    with open('topics_'+a_cmp.lower()+".json","w") as json_out:
+    result   = DB_cursor.fetchall() 
+    with open('topics_data/topics_'+a_cmp.lower()+".json","w") as json_out:
         pros = []; cons = []; reviews = [];
         for a_review in result:
-            if a_review['pros']: pros.append(a_review['pros'])
-            if a_review['cons']: cons.append(a_review['cons'])
-            if a_review['review_text']: reviews.append(a_review['review_text'])
+            if parse_location(a_review['poster_location'].upper()):
+                if a_review['pros'] and '\\' not in a_review['pros']: pros.append(a_review['pros'])
+                if a_review['cons'] and '\\' not in a_review['cons']: cons.append(a_review['cons'])
+                if a_review['review_text'] and '\\' not in a_review['review_text']: reviews.append(a_review['review_text'])
         pro_cluster = LDA(pros)
         con_cluster = LDA(cons)
         rev_cluster = LDA(reviews)
