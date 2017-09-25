@@ -132,13 +132,6 @@ $("#comps_submit")
         })
     });
 
-
-$("#apply_filters")
-	.button()
-	.click(function(){
-		render_us_map();
-});
-
 // Filters --------------------------------------------------------------------------------------------------
 var nonLinearSlider = document.getElementById('datef');
 
@@ -160,8 +153,21 @@ nonLinearSlider.noUiSlider.on('update',
 	function ( values, handle, unencoded, isTap, positions ) {
 		sliders[handle] = values[handle];
 		node.innerHTML = 'From ' + perc_to_date(sliders[0]).format('ll') + ' to ' + perc_to_date(sliders[1]).format('ll');
+	}
+);
+
+nonLinearSlider.noUiSlider.on('end',
+	function ( values, handle, unencoded, isTap, positions ) {
+		sliders[handle] = values[handle];
 		low_date  = perc_to_date(sliders[0]);
 		high_date = perc_to_date(sliders[1]);
 		render_us_map();
 	}
 );
+
+$(document).ready(function() {
+    $('input:radio[name=radios]').change(function() {
+         score_field = this.id;
+				 render_us_map();
+    });
+});

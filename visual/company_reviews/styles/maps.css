@@ -6,16 +6,16 @@
 .state:hover{
 	fill-opacity:0.5;
 }
-#tooltip {   
-	position: absolute;           
+#tooltip {
+	position: absolute;
 	text-align: center;
-	padding: 20px;             
+	padding: 20px;
 	margin: 10px;
-	font: 12px sans-serif;        
-	background: lightsteelblue;   
-	border: 1px;      
-	border-radius: 2px;           
-	pointer-events: none;         
+	font: 12px sans-serif;
+	background: lightsteelblue;
+	border: 1px;
+	border-radius: 2px;
+	pointer-events: none;
 }
 #tooltip h4{
 	margin:0;
