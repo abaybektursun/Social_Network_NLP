@@ -66,8 +66,9 @@ def NMF(content):
     return extract(nmf, tfidf_feature_names, no_top_words)
     
 
+probabilities = []
 def LDA(content):
-    global NUM_FEATURES; global NUM_TOPICS;
+    global NUM_FEATURES; global NUM_TOPICS; global probabilities;
     # Convert a collection of text documents to a matrix of token counts
     count_vectorizer = CountVectorizer(max_features=NUM_FEATURES, max_df=0.95, min_df=2, stop_words='english')
     # Learn the vocabulary dictionary and return term-document matrix.
@@ -76,8 +77,10 @@ def LDA(content):
     count_feature_names = count_vectorizer.get_feature_names()
     # LDA (Latent Dirichlet allocation)
     lda = LatentDirichletAllocation(n_components=NUM_TOPICS, max_iter=5, learning_method='online', learning_offset=50.,random_state=0).fit(count_term_doc)
-    no_top_words = 10
+    no_top_words = 5
+    probabilities = lda.transform(count_term_doc).tolist()
     return extract(lda, count_feature_names, no_top_words)
+
 
 def parse_location(raw_location):
     states = [("Alabama","AL"),
@@ -163,21 +166,31 @@ NUM_TOPICS   = 5
 for a_cmp in cmp_list:
     DB_cursor.execute("SELECT * FROM indeed." + a_cmp)
     result   = DB_cursor.fetchall() 
-    with open('topics_data/topics_'+a_cmp.lower()+".json","w") as json_out:
+    with open('topics_data/topics_'+a_cmp.lower()+".json","w") as json_out, open('topics_data/prob_topics_'+a_cmp.lower()+".json","w") as prob_out:
         pros = []; cons = []; reviews = [];
+        date_pros = []; date_cons = []; date_reviews = [];
+        prob_pros = []; prob_cons = []; prob_reviews = [];
         for a_review in result:
             if parse_location(a_review['poster_location'].upper()):
-                if a_review['pros'] and '\\' not in a_review['pros']: pros.append(a_review['pros'])
-                if a_review['cons'] and '\\' not in a_review['cons']: cons.append(a_review['cons'])
-                if a_review['review_text'] and '\\' not in a_review['review_text']: reviews.append(a_review['review_text'])
-        pro_cluster = LDA(pros)
-        con_cluster = LDA(cons)
-        rev_cluster = LDA(reviews)
+                if a_review['pros'] and '\\' not in a_review['pros']: pros.append(a_review['pros']); date_pros.append(a_review['post_date'])
+                if a_review['cons'] and '\\' not in a_review['cons']: cons.append(a_review['cons']); date_cons.append(a_review['post_date'])
+                if a_review['review_text'] and '\\' not in a_review['review_text']: reviews.append(a_review['review_text']); date_reviews.append(a_review['post_date'])
+        pro_cluster = LDA(pros);    prob_pros    = list(probabilities);
+        con_cluster = LDA(cons);    prob_cons    = list(probabilities);
+        rev_cluster = LDA(reviews); prob_reviews = list(probabilities);
          
         json.dump({
             "name":a_cmp.replace('_',' '), 
             "children": [{"name":"Cons","children":con_cluster}, {"name":"Pros","children":pro_cluster}, {"name":"General Review","children":rev_cluster}]
         }, json_out, indent=4)
+        
+        prob_data = {}
+        for date, prob, revtype in [(date_pros, prob_pros, 'Pros'),(date_cons, prob_cons, 'Cons'),(date_reviews, prob_reviews, 'General Review')]:
+            data_list = []
+            for idx in range(len(prob)):
+                data_list.append([prob[idx],date[idx]])
+            prob_data[revtype] = data_list
+        json.dump(prob_data,prob_out, indent=4,default=str)
     
 # Housekeeping ############################################################################################
 DB_cursor.close()
