@@ -11,7 +11,9 @@ var sData = {};
 var reviews = [];
 var reviews_swp = [];
 var score_field = "overall_review_score";
-var min_date, max_date;
+var min_date = max_date = moment();
+var low_date = high_date = moment();
+var duration = moment.duration(max_date.diff(min_date));
 
 function ajax1() {
   return $.getJSON( "/us_map_data", function( json ) {
@@ -34,7 +36,9 @@ function render_us_map(){
                 for(var i = 0; i < reviews.length; i++)
                 {
                     if(
-											reviews[i].state === d
+											reviews[i].state === d &&
+											moment(reviews[i].post_date) <= high_date &&
+											moment(reviews[i].post_date) >= low_date
 										)
                     {
                         num_records += 1;
@@ -67,13 +71,45 @@ function render_us_map(){
 
 }
 
+// After getting data max and min dates are calculated
+function max_min_date() {
+
+	  var momentDate;
+		var momentMax, momentMin;
+
+    momentDate = moment(reviews[0].post_date);
+		momentMax = momentDate; momentMin = momentDate;
+    for(var i = 1; i < reviews.length; i++)
+		{
+			momentDate = moment(reviews[i].post_date);
+			if(momentDate > momentMax) {momentMax = momentDate}
+			if(momentDate < momentMin) {momentMin = momentDate}
+		}
+
+		min_date = low_date = momentMin;
+		max_date = high_date = momentMax;
+
+		duration = moment.duration(max_date.diff(min_date));
+}
+
+
 // Wait until data is arrived
 $.when(ajax1()).done(function(a1){
 // the code here will be executed when all four ajax requests resolve.
 // a1, a2, a3... are lists of length 3 containing the response text,
 // status, and jqXHR object for each of the four ajax calls respectively.
-    render_us_map()
+    max_min_date();
+    render_us_map();
 });
+
+// perc - percent
+function perc_to_date(perc) {
+		var days = duration.asDays();
+		var adjust_days = Math.floor(days * perc);
+		var perc_date = min_date.clone();
+		perc_date.add(adjust_days, 'days');
+		return perc_date;
+}
 
 // Default checked ########################################
 //document.getElementById("comps").value = "HPE";       //#
@@ -91,7 +127,8 @@ $("#comps_submit")
             );
         };
         $.when(get_reviews()).done(function(a1){
-            render_us_map()
+					  max_min_date();
+            render_us_map();
         })
     });
 
@@ -101,11 +138,11 @@ var nonLinearSlider = document.getElementById('datef');
 
 noUiSlider.create(nonLinearSlider, {
 	connect: true,
-	behaviour: 'tap',
-	start: [ 0, 100 ],
+	behaviour: 'tap-drag',
+	start: [ 0, 1 ],
 	range: {
 		'min': [ 0 ],
-		'max': [ 100 ]
+		'max': [ 1 ]
 	}
 });
 
@@ -116,6 +153,6 @@ var sliders = [0.0, 0.0];
 nonLinearSlider.noUiSlider.on('update',
 	function ( values, handle, unencoded, isTap, positions ) {
 		sliders[handle] = values[handle];
-		node.innerHTML = sliders[0] + ',' + sliders[1];
+		node.innerHTML = 'From ' + perc_to_date(sliders[0]).format('ll') + ' to ' + perc_to_date(sliders[1]).format('ll');
 	}
 );
